@@ -1,0 +1,31 @@
+{
+  "name": "zuji",
+  "version": "0.0.0",
+  "description": "A lightweight number formatting utility",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist",
+    "test": "bun test",
+    "prepare": "bun run build",
+    "publish": "npm publish"
+  },
+  "keywords": [
+    "number",
+    "format",
+    "currency",
+    "percentage"
+  ],
+  "author": "Kyle Gill",
+  "license": "MIT",
+  "dependencies": {
+    "d3-format": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/d3-format": "^3.0.0"
+  }
+}
