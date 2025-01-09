@@ -5,8 +5,29 @@ import { zuji } from "../../src/index";
 const TEST_CASES = [
   {
     value: 100,
+    format: "small-currency",
+    description: "Get a precise a currency like a dollar amount",
+  },
+  {
+    value: 100,
     format: "short-currency",
-    description: "Shorten a currency like a dollar amount",
+    description:
+      "Abbreviate a currency like a dollar amount that you expect to be a smallish value (<1000)",
+  },
+  {
+    value: 100_000_000,
+    format: "long-currency",
+    description: "Display a precise currency like a dollar amount",
+  },
+  {
+    value: 100_000_000,
+    format: "big-currency",
+    description: "Abbreviate a currency like a dollar amount",
+  },
+  {
+    value: 1000,
+    format: "small-number",
+    description: "Shorten a number like a count",
   },
   {
     value: 1000,
@@ -17,11 +38,6 @@ const TEST_CASES = [
     value: 0.53,
     format: "short-percent",
     description: "Shorten a percentage like a decimal",
-  },
-  {
-    value: 100,
-    format: "long-currency",
-    description: "Lengthen a currency like a dollar amount",
   },
   {
     value: 1000,
