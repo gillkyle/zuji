@@ -1,4 +1,9 @@
-import { format } from "d3-format";
+import { formatLocale } from "d3-format";
+import {
+  localeDefinitions,
+  SUPPORTED_LOCALES,
+  SupportedLocale,
+} from "./locales";
 
 /**
  * Predefined number formatting shortcuts for common use cases
@@ -36,22 +41,7 @@ const SHORTCUT_FORMATS = {
   "short-decimal": { format: ".2s", value: "short-decimal" },
 } as const;
 
-/**
- * Predefined number formatting shortcuts for common use cases
- */
-export enum ZujiShortcut {
-  /**
-   * Format as currency with 2 decimal places (e.g. $1,234.56)
-   */
-  SmallCurrency = "small-currency",
-
-  /**
-   * Format as currency with SI prefix (e.g. $1.2M)
-   */
-  ShortCurrency = "short-currency",
-
-  // ... etc.
-}
+export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
 
 /*
 The general form of a specifier is:
@@ -305,7 +295,8 @@ type ZujiType =
   | "X"
   | "c";
 
-type ZujiOptions = {
+export type ZujiOptions = {
+  // ------ FORMAT SPECIFIER OPTIONS ------
   /** A single fill character to use for padding that is added (default: " ") combined with the alignment character (default: ">" or right-aligned) */
   fill?: ZujiFillAndAlign;
   /** The sign to display for numbers ("+", "-", "(", or " ") */
@@ -324,8 +315,11 @@ type ZujiOptions = {
   trim?: boolean;
   /** The type of formatting to use (e.g., "f" for fixed-point, "%" for percentage) */
   type?: ZujiType;
+  // ------ EXTRA HELPER OPTIONS ------
   /** An option to bail out and use a d3-format specifier that is already assembled */
   d3format?: string;
+  /** An option to set the locale for the formatting */
+  locale?: SupportedLocale;
 };
 
 const ZUJI_DEFAULT_OPTIONS = {
@@ -368,13 +362,18 @@ function generateFormatSpecifier(options: Partial<ZujiOptions>) {
   );
 }
 
-export type NumeralString = `${bigint}` | `${bigint}.${bigint}`;
+type NumeralString = `${bigint}` | `${bigint}.${bigint}`;
 
 export function zuji(
   number: number | NumeralString,
-  options: ZujiShortcut | ZujiOptions = {}
+  options: null | undefined | ZujiShortcut | ZujiOptions = {}
 ) {
   let formatSpecifier: string;
+  // handle the Infinity edge case
+  if (number === Infinity) return "∞";
+  if (number === -Infinity) return "-∞";
+  // skip if no options are provided
+  if (options === null || options === undefined) return number;
 
   // if the number is a string, attempt to convert it to a number
   if (typeof number === "string") {
@@ -394,13 +393,30 @@ export function zuji(
     );
   }
 
-  if (typeof options === "string" && options in SHORTCUT_FORMATS) {
+  const isStringArg = typeof options === "string";
+  const isShortcut = isStringArg && options in SHORTCUT_FORMATS;
+  if (isShortcut) {
     formatSpecifier = SHORTCUT_FORMATS[options].format;
-  } else if (typeof options === "string") {
+  } else if (isStringArg) {
     formatSpecifier = options;
   } else {
     formatSpecifier = generateFormatSpecifier(options);
   }
 
-  return format(formatSpecifier)(number);
+  // use en-US locale by default
+  let locale: SupportedLocale = "en-US";
+  if (!isStringArg && options.locale) {
+    locale = options.locale;
+  }
+
+  // if the locale is not supported, throw an error
+  if (!locale || !SUPPORTED_LOCALES.includes(locale)) {
+    throw new Error(`Unsupported locale: ${locale}`);
+  }
+
+  // set the locale
+  const localeDefinition = localeDefinitions[locale];
+  const localeObject = formatLocale(localeDefinition as any);
+
+  return localeObject.format(formatSpecifier)(number);
 }
