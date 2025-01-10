@@ -373,7 +373,7 @@ export function zuji(
   if (number === Infinity) return "∞";
   if (number === -Infinity) return "-∞";
   // skip if no options are provided
-  if (options === null || options === undefined) return number;
+  if (options === null || options === undefined) return String(number);
 
   // if the number is a string, attempt to convert it to a number
   if (typeof number === "string") {

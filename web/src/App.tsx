@@ -1,5 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { ExampleTable } from "@/components/example-table";
+import { FormatMatrix } from "@/components/format-matrix";
+import { Playground } from "@/components/playground";
 import { ProseContainer } from "@/components/prose-container";
 import {
   Breadcrumb,
@@ -335,6 +337,16 @@ export default function Page() {
                 easy to understand, and tweak options as you need to.
               </p>
             </ProseContainer>
+            <ProseContainer>
+              <h2>Format Matrix</h2>
+              <p>
+                Below is a matrix showing different combinations of formatting
+                options applied to the number 1540.1:
+              </p>
+            </ProseContainer>
+            <WideContainer>
+              <FormatMatrix />
+            </WideContainer>
             <WideContainer>
               <ExampleTable examples={TEST_CASES} />
             </WideContainer>
@@ -434,6 +446,15 @@ console.log(formattedCurrency); // $100
             <div className="w-full max-w-[1400px]">
               <ExampleTable examples={EXPONENTIAL_EXAMPLES} />
             </div>
+
+            <ProseContainer>
+              <h2>Interactive Playground</h2>
+              <p>
+                Use this playground to experiment with different formatting
+                options and see the results in real-time.
+              </p>
+            </ProseContainer>
+            <Playground />
           </div>
         </SidebarInset>
       </SidebarProvider>
