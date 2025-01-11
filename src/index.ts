@@ -20,55 +20,46 @@ import {
  */
 const SHORTCUT_FORMATS = {
   /** Format as currency with 2 decimal places (e.g. $1,234.56) */
-  "small-currency": { zujiOptions: {
-    symbol: "$",
-    precision: 2,
-    comma: true,
-  }, value: "small-currency" },
+  "small-currency": {
+    zujiOptions: {
+      symbol: "$",
+      precision: 2,
+      comma: true,
+    },
+    value: "small-currency",
+  },
   /** Format as currency with SI prefix (e.g. $1.2M) */
-  "short-currency": { zujiOptions: {
-    symbol: "$",
-    precision: 2,
-    comma: true,
-    trim: true,
-    type: "s",
-  }, value: "short-currency" },
+  "short-currency": {
+    zujiOptions: {
+      symbol: "$",
+      precision: 2,
+      comma: true,
+      trim: true,
+      type: "s",
+    },
+    value: "short-currency",
+  },
   /** Format as currency with SI prefix, no decimals (e.g. $1M) */
-  "long-currency": { zujiOptions: {
-    symbol: "$",
-    precision: 2,
-    comma: true,
-    trim: true,
-    type: "s",
-  }, value: "long-currency" },
+  "long-currency": {
+    zujiOptions: {
+      symbol: "$",
+      precision: 2,
+      comma: true,
+      trim: true,
+      type: "s",
+    },
+    value: "long-currency",
+  },
   /** Format as currency with no decimals (e.g. $1,234) */
-  "big-currency": { zujiOptions: {
-    
-  }, value: "big-currency" },
+  "big-currency": { zujiOptions: {}, value: "big-currency" },
   /** Format as number with no decimals and thousands separator (e.g. 1,234) */
-  "small-number": { zujiOptions: {
-    
-  }, value: "small-number" },
+  "small-number": { zujiOptions: {}, value: "small-number" },
   /** Format as number with SI prefix (e.g. 1.2M) */
-  "short-number": { zujiOptions: {
-    
-  }, value: "short-number" },
+  "short-number": { zujiOptions: {}, value: "short-number" },
   /** Format as number with SI prefix, no decimals (e.g. 1M) */
-  "long-number": { zujiOptions: {
-    
-  }, value: "long-number" },
+  "long-number": { zujiOptions: {}, value: "long-number" },
   /** Format as number with no decimals and thousands separator (e.g. 1,234) */
-  "big-number": { zujiOptions: {
-    
-  }, value: "big-number" },
-  /** Format as percentage with 1 decimal place (e.g. 12.3%) */
-  "short-percent": { zujiOptions: {
-    
-  }", value: "short-percent" },
-  /** Format with 2 significant digits and SI prefix (e.g. 1.2k) */
-  "short-decimal": { zujiOptions: {
-    
-  }, value: "short-decimal" },
+  "big-number": { zujiOptions: {}, value: "big-number" },
 } as const;
 
 export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
