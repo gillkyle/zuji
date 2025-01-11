@@ -1,443 +1,244 @@
-import { formatLocale } from "d3-format";
-import {
-  localeDefinitions,
-  SUPPORTED_LOCALES,
-  SupportedLocale,
-} from "./locales";
+import { ISO417CurrencyCode } from "./currency";
+import { OneToTwentyOne, SanctionedCLDRUnit, ZeroToTwenty } from "./units";
 
 /**
- * Predefined number formatting shortcuts for common use cases
- * @property "small-currency" - Format as currency with 2 decimal places (e.g. $1,234.56)
- * @property "short-currency" - Format as currency with SI prefix (e.g. $1.2M)
- * @property "long-currency" - Format as currency with SI prefix, no decimals (e.g. $1M)
- * @property "big-currency" - Format as currency with no decimals (e.g. $1,234)
- * @property "small-number" - Format as number with no decimals and thousands separator (e.g. 1,234)
- * @property "short-number" - Format as number with SI prefix (e.g. 1.2M)
- * @property "long-number" - Format as number with SI prefix, no decimals (e.g. 1M)
- * @property "big-number" - Format as number with no decimals and thousands separator (e.g. 1,234)
- * @property "short-percent" - Format as percentage with 1 decimal place (e.g. 12.3%)
- * @property "short-decimal" - Format with 2 significant digits and SI prefix (e.g. 1.2k)
+ * Options for number formatting using Intl.NumberFormat
  */
-const SHORTCUT_FORMATS = {
-  /** Format as currency with 2 decimal places (e.g. $1,234.56) */
+export interface ZujiOptions {
+  // ------------ General options ------------
+  /** The locale to use for formatting (e.g., "en-US", "fr-FR") */
+  locale?: string;
+
+  // ------------ Style options ------------
+  /** The formatting style to use. Possible values are:
+   *
+   * - "decimal" (default) - Plain number formatting
+   * - "currency" - Currency formatting (requires currency property)
+   * - "percent" - Percentage formatting
+   * - "unit" - Unit formatting (requires unit property)
+   */
+  style?: Intl.NumberFormatOptions["style"];
+
+  /** The currency to use in currency formatting. Required when style is "currency".
+   * Uses ISO 4217 currency codes (e.g., "USD", "EUR", "JPY")
+   */
+  currency?: ISO417CurrencyCode;
+
+  /** How to display the currency. Possible values are:
+   *
+   * - "symbol" (default) - Use currency symbol (e.g., "$")
+   * - "narrowSymbol" - Use narrow symbol (e.g., "$" instead of "US$")
+   * - "code" - Use currency code (e.g., "USD")
+   * - "name" - Use currency name (e.g., "US Dollar")
+   */
+  currencyDisplay?: Intl.NumberFormatOptions["currencyDisplay"];
+
+  /** How to handle negative currency values. Possible values are:
+   *
+   * - "standard" (default) - Use minus sign (e.g., -$1.00)
+   * - "accounting" - Use accounting notation (e.g., ($1.00))
+   */
+  currencySign?: "standard" | "accounting";
+
+  /** The unit to use in unit formatting. Required when style is "unit".
+   * Uses sanctioned unit identifiers (e.g., "kilometer-per-hour", "percent", "liter")
+   */
+  unit?: SanctionedCLDRUnit;
+
+  /** How to display the unit. Possible values are:
+   *
+   * - "short" (default) - Short unit formatting (e.g., "16 l")
+   * - "narrow" - Narrow unit formatting (e.g., "16l")
+   * - "long" - Long unit formatting (e.g., "16 liters")
+   */
+  unitDisplay?: Intl.NumberFormatOptions["unitDisplay"];
+
+  // ------------ Digit options ------------
+  /** The minimum number of integer digits to use.
+   * Value range: 1 - 21
+   * Default: 1
+   */
+  minimumIntegerDigits?: OneToTwentyOne;
+
+  /** The minimum number of fraction digits to display.
+   * Value range: 0 - 20
+   * Default: 0 for plain number and percent formatting
+   * Default for currency: The number of minor unit digits provided by the ISO 4217 currency code list
+   */
+  minimumFractionDigits?: ZeroToTwenty;
+
+  /** The maximum number of fraction digits to display.
+   * Value range: 0 - 20
+   * Default for plain number: max(minimumFractionDigits, 3)
+   * Default for currency: max(minimumFractionDigits, number of minor unit digits provided by the ISO 4217 currency code list)
+   * Default for percent: max(minimumFractionDigits, 0)
+   */
+  maximumFractionDigits?: ZeroToTwenty;
+
+  /** The minimum number of significant digits to display.
+   * Value range: 1 - 21
+   * Default: 1
+   */
+  minimumSignificantDigits?: OneToTwentyOne;
+
+  /** The maximum number of significant digits to display.
+   * Value range: 1 - 21
+   * Default: 21
+   */
+  maximumSignificantDigits?: OneToTwentyOne;
+
+  // ------------ Notation options ------------
+  /** The formatting that should be displayed for the number. Possible values are:
+   *
+   * - "standard" (default) - Plain number formatting
+   * - "scientific" - Scientific notation (e.g., 1.23E4)
+   * - "engineering" - Engineering notation (e.g., 12.3E3)
+   * - "compact" - Compact notation (e.g., "12K")
+   */
+  notation?: Intl.NumberFormatOptions["notation"];
+
+  /** Only used when notation is "compact". Possible values are:
+   *
+   * - "short" (default) - Short compact notation (e.g., "12K")
+   * - "long" - Long compact notation (e.g., "12 thousand")
+   */
+  compactDisplay?: Intl.NumberFormatOptions["compactDisplay"];
+
+  /** Whether to use grouping separators, such as thousands separators or thousand/lakh/crore separators.
+
+. Possible values are:
+   *
+   * - "auto" (default if notation is not "compact") - Use locale preferences
+   * - "min2" (default if notation is "compact") - ensures grouping separators are used only when there are **at least two digits** in a group. Ex: 3200 -> 3200 but 32000 -> 32,000
+   * - "always" - Always use grouping separators
+   * - true - Same as "always"
+   * - false - Never use grouping separators
+   */
+  useGrouping?: Intl.NumberFormatOptions["useGrouping"];
+
+  /** When to display the sign. Possible values are:
+   *
+   * - "auto" (default) - Sign for negative numbers only
+   * - "always" - Always show sign
+   * - "exceptZero" - Show sign except for zero
+   * - "negative" - Show sign for negative numbers only
+   * - "never" - Never show sign
+   */
+  signDisplay?: Intl.NumberFormatOptions["signDisplay"];
+}
+
+/**
+ * Predefined number formatting shortcuts
+ */
+const SHORTCUT_FORMATS: Record<string, ZujiOptions> = {
   "small-currency": {
-    zujiOptions: {
-      symbol: "$",
-      precision: 2,
-      comma: true,
-    },
-    value: "small-currency",
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: true,
   },
-  /** Format as currency with SI prefix (e.g. $1.2M) */
   "short-currency": {
-    zujiOptions: {
-      symbol: "$",
-      precision: 2,
-      comma: true,
-      trim: true,
-      type: "s",
-    },
-    value: "short-currency",
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 1,
   },
-  /** Format as currency with SI prefix, no decimals (e.g. $1M) */
   "long-currency": {
-    zujiOptions: {
-      symbol: "$",
-      precision: 2,
-      comma: true,
-      trim: true,
-      type: "s",
-    },
-    value: "long-currency",
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    compactDisplay: "long",
+    maximumFractionDigits: 0,
   },
-  /** Format as currency with no decimals (e.g. $1,234) */
-  "big-currency": { zujiOptions: {}, value: "big-currency" },
-  /** Format as number with no decimals and thousands separator (e.g. 1,234) */
-  "small-number": { zujiOptions: {}, value: "small-number" },
-  /** Format as number with SI prefix (e.g. 1.2M) */
-  "short-number": { zujiOptions: {}, value: "short-number" },
-  /** Format as number with SI prefix, no decimals (e.g. 1M) */
-  "long-number": { zujiOptions: {}, value: "long-number" },
-  /** Format as number with no decimals and thousands separator (e.g. 1,234) */
-  "big-number": { zujiOptions: {}, value: "big-number" },
+  "big-currency": {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  },
+  "small-number": {
+    style: "decimal",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  },
+  "short-number": {
+    style: "decimal",
+    notation: "compact",
+    compactDisplay: "short",
+    maximumFractionDigits: 1,
+  },
+  "long-number": {
+    style: "decimal",
+    notation: "compact",
+    compactDisplay: "long",
+    maximumFractionDigits: 0,
+  },
+  "big-number": {
+    style: "decimal",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  },
+  "short-percent": {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  },
 } as const;
 
 export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
 
-/*
-The general form of a specifier is:
-`[​[fill]align][sign][symbol][0][width][,][.precision][~][type]
-
-This is the API we are converting into something more heavily typed and well documented.
-
-The available type values are:
-
-e - exponent notation.
-f - fixed point notation.
-g - either decimal or exponent notation, rounded to significant digits.
-r - decimal notation, rounded to significant digits.
-s - decimal notation with an SI prefix, rounded to significant digits.
-% - multiply by 100, and then decimal notation with a percent sign.
-p - multiply by 100, round to significant digits, and then decimal notation with a percent sign.
-b - binary notation, rounded to integer.
-o - octal notation, rounded to integer.
-d - decimal notation, rounded to integer.
-x - hexadecimal notation, using lower-case letters, rounded to integer.
-X - hexadecimal notation, using upper-case letters, rounded to integer.
-c - character data, for a string of text.
-*/
-
-/*
-The format specifier is a magic string that goes into d3-format.
-
-We take it's specific inputs and type them stronger with nice descriptions to make it easier to use.
-
-This is its code:
-// [[fill]align][sign][symbol][0][width][,][.precision][~][type]
-var re = /^(?:(.)?([<>=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$/i;
-
-export default function formatSpecifier(specifier) {
-  if (!(match = re.exec(specifier))) throw new Error("invalid format: " + specifier);
-  var match;
-  return new FormatSpecifier({
-    fill: match[1],
-    align: match[2],
-    sign: match[3],
-    symbol: match[4],
-    zero: match[5],
-    width: match[6],
-    comma: match[7],
-    precision: match[8] && match[8].slice(1),
-    trim: match[9],
-    type: match[10]
-  });
-}
-
-formatSpecifier.prototype = FormatSpecifier.prototype; // instanceof
-
-export function FormatSpecifier(specifier) {
-  this.fill = specifier.fill === undefined ? " " : specifier.fill + "";
-  this.align = specifier.align === undefined ? ">" : specifier.align + "";
-  this.sign = specifier.sign === undefined ? "-" : specifier.sign + "";
-  this.symbol = specifier.symbol === undefined ? "" : specifier.symbol + "";
-  this.zero = !!specifier.zero;
-  this.width = specifier.width === undefined ? undefined : +specifier.width;
-  this.comma = !!specifier.comma;
-  this.precision = specifier.precision === undefined ? undefined : +specifier.precision;
-  this.trim = !!specifier.trim;
-  this.type = specifier.type === undefined ? "" : specifier.type + "";
-}
-
-FormatSpecifier.prototype.toString = function() {
-  return this.fill
-      + this.align
-      + this.sign
-      + this.symbol
-      + (this.zero ? "0" : "")
-      + (this.width === undefined ? "" : Math.max(1, this.width | 0))
-      + (this.comma ? "," : "")
-      + (this.precision === undefined ? "" : "." + Math.max(0, this.precision | 0))
-      + (this.trim ? "~" : "")
-      + this.type;
-};
-*/
-
-/*
-The fill can be any character. The presence of a fill character is signaled by the align character following it, which must be one of the following:
-
-> - Forces the field to be right-aligned within the available space. (Default behavior).
-< - Forces the field to be left-aligned within the available space.
-^ - Forces the field to be centered within the available space.
-= - like >, but with any sign and symbol to the left of any padding.
-The sign can be:
-
-- - nothing for zero or positive and a minus sign for negative. (Default behavior.)
-+ - a plus sign for zero or positive and a minus sign for negative.
-( - nothing for zero or positive and parentheses for negative.
-  (space) - a space for zero or positive and a minus sign for negative.
-The symbol can be:
-
-$ - apply currency symbols per the locale definition.
-# - for binary, octal, or hexadecimal notation, prefix by 0b, 0o, or 0x, respectively.
-*/
-
-// create an example on all properties based on a simple number that demonstrates it's purpose
-
-type CharString =
-  | "!"
-  | '"'
-  | "#"
-  | "$"
-  | "%"
-  | "&"
-  | "'"
-  | "("
-  | ")"
-  | "*"
-  | "+"
-  | ","
-  | "-"
-  | "."
-  | "/"
-  | "0"
-  | "1"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9"
-  | ":"
-  | ";"
-  | "<"
-  | "="
-  | ">"
-  | "?"
-  | "@"
-  | "A"
-  | "B"
-  | "C"
-  | "D"
-  | "E"
-  | "F"
-  | "G"
-  | "H"
-  | "I"
-  | "J"
-  | "K"
-  | "L"
-  | "M"
-  | "N"
-  | "O"
-  | "P"
-  | "Q"
-  | "R"
-  | "S"
-  | "T"
-  | "U"
-  | "V"
-  | "W"
-  | "X"
-  | "Y"
-  | "Z"
-  | "["
-  | "\\"
-  | "]"
-  | "^"
-  | "_"
-  | "`"
-  | "a"
-  | "b"
-  | "c"
-  | "d"
-  | "e"
-  | "f"
-  | "g"
-  | "h"
-  | "i"
-  | "j"
-  | "k"
-  | "l"
-  | "m"
-  | "n"
-  | "o"
-  | "p"
-  | "q"
-  | "r"
-  | "s"
-  | "t"
-  | "u"
-  | "v"
-  | "w"
-  | "x"
-  | "y"
-  | "z"
-  | "{"
-  | "|"
-  | "}"
-  | "~"
-  | " ";
-
-/** Alignment options for number formatting
- * @property `${string}>` - Forces the field to be right-aligned within the available space (Default) "  100"
- * @property `${string}<` - Forces the field to be left-aligned within the available space "100  "
- * @property `${string}^` - Forces the field to be centered within the available space " 100 "
- * @property `${string}=` - Like right-align, but with any sign and symbol to the left of padding "-$100"
- */
-type ZujiFillAndAlign =
-  | `${CharString}>`
-  | `${CharString}<`
-  | `${CharString}^`
-  | `${CharString}=`;
-
-/** Sign options for number formatting
- * @property "-" - Nothing for zero or positive and a minus sign for negative (Default) "-100" "100"
- * @property "+" - A plus sign for zero or positive and a minus sign for negative "-100" "+100"
- * @property "(" - Nothing for zero or positive and parentheses for negative "(100)" "100"
- * @property " " - A space for zero or positive and a minus sign for negative "-100" "100"
- */
-type ZujiSign = "-" | "+" | "(" | " ";
-
-/** Symbol options for number formatting
- * @property "$" - Apply currency symbols per the locale definition
- * @property "#" - For binary, octal, or hexadecimal notation, prefix by 0b, 0o, or 0x, respectively
- */
-type ZujiSymbol = "$" | "#";
-
-/** Type options for number formatting
- * @property "e" - Exponent notation
- * @property "f" - Fixed point notation
- * @property "g" - Either decimal or exponent notation, rounded to significant digits
- * @property "r" - Decimal notation, rounded to significant digits
- * @property "s" - Decimal notation with an SI prefix, rounded to significant digits
- * @property "%" - Multiply by 100, and then decimal notation with a percent sign
- * @property "p" - Multiply by 100, round to significant digits, and then decimal notation with a percent sign
- * @property "b" - Binary notation, rounded to integer
- * @property "o" - Octal notation, rounded to integer
- * @property "d" - Decimal notation, rounded to integer
- * @property "x" - Hexadecimal notation, using lower-case letters, rounded to integer
- * @property "X" - Hexadecimal notation, using upper-case letters, rounded to integer
- * @property "c" - Character data, for a string of text
- */
-type ZujiType =
-  | "e"
-  | "f"
-  | "g"
-  | "r"
-  | "s"
-  | "%"
-  | "p"
-  | "b"
-  | "o"
-  | "d"
-  | "x"
-  | "X"
-  | "c";
-
-export type ZujiOptions = {
-  // ------ FORMAT SPECIFIER OPTIONS ------
-  /** A single fill character to use for padding that is added (default: " ") combined with the alignment character (default: ">" or right-aligned) */
-  fill?: ZujiFillAndAlign;
-  /** The sign to display for numbers ("+", "-", "(", or " ") */
-  sign?: ZujiSign;
-  /** The symbol to use for currency formatting ("$" or "#") */
-  symbol?: ZujiSymbol;
-  /** Whether to pad with zeros instead of spaces, this is identical to setting 0= for the fill character */
-  // zero?: boolean;
-  /** The minimum field width to ensure */
-  width?: number;
-  /** Whether to enable the thousands separators, usually ",", but depends on locale */
-  comma?: boolean;
-  /** The number of digits after the decimal point */
-  precision?: number;
-  /** Whether to trim insignificant trailing zeros */
-  trim?: boolean;
-  /** The type of formatting to use (e.g., "f" for fixed-point, "%" for percentage) */
-  type?: ZujiType;
-  // ------ EXTRA HELPER OPTIONS ------
-  /** An option to bail out and use a d3-format specifier that is already assembled */
-  d3format?: string;
-  /** An option to set the locale for the formatting */
-  locale?: SupportedLocale;
-};
-
-const ZUJI_DEFAULT_OPTIONS = {
-  fill: " >",
-  sign: "-",
-  symbol: "",
-  width: "",
-  comma: "",
-  precision: "",
-  trim: "",
-  type: "",
-} as const;
-
 /**
- * Generates a format specifier for d3-format from the given ZujiOptions.
+ * Formats a number using Intl.NumberFormat with the specified options
+ * @param number - The number to format
+ * @param options - a shortcut string or Int.NumberFormatting options
  *
- * @param options - The set of options to use for the formatt specifier.
- * @returns The format specifier string to be passed to d3-format.
+ * @returns The formatted number string
  */
-function generateFormatSpecifier(options: Partial<ZujiOptions>) {
-  const specifierFill = options.fill ?? ZUJI_DEFAULT_OPTIONS.fill;
-  const specifierSign = options.sign ?? ZUJI_DEFAULT_OPTIONS.sign;
-  const specifierSymbol = options.symbol ?? ZUJI_DEFAULT_OPTIONS.symbol;
-  const specifierWidth =
-    options.width === undefined ? "" : Math.max(1, options.width | 0);
-  const specifierComma = options.comma ? "," : ZUJI_DEFAULT_OPTIONS.comma;
-  const specifierPrecision =
-    options.precision === undefined ? "" : `.${Math.max(0, options.precision)}`;
-  const specifierTrim = options.trim ? "~" : ZUJI_DEFAULT_OPTIONS.trim;
-  const specifierType = options.type ?? ZUJI_DEFAULT_OPTIONS.type;
-  return (
-    specifierFill +
-    specifierSign +
-    specifierSymbol +
-    specifierWidth +
-    specifierComma +
-    specifierPrecision +
-    specifierTrim +
-    specifierType
-  );
-}
-
-type NumeralString = `${bigint}` | `${bigint}.${bigint}`;
-
 export function zuji(
-  number: number | NumeralString,
-  options: null | undefined | ZujiShortcut | ZujiOptions = {}
-) {
-  let formatSpecifier: string;
-  // handle the Infinity edge case
+  number: number | string,
+  options: ZujiOptions | ZujiShortcut | null | undefined = {}
+): string {
+  // Handle special cases
   if (number === Infinity) return "∞";
   if (number === -Infinity) return "-∞";
-  // skip if no options are provided
   if (options === null || options === undefined) return String(number);
 
-  // if the number is a string, attempt to convert it to a number
+  // Convert string numbers to numbers
   if (typeof number === "string") {
-    number = Number(number);
-    // check to make sure it's a valid number
-    if (isNaN(number)) {
-      throw new TypeError(
-        `Invalid input: ${number}, expected a JavaScript number`
-      );
+    const parsed = Number(number);
+    if (isNaN(parsed)) {
+      throw new TypeError(`Invalid input: ${number}, expected a valid number`);
     }
+    number = parsed;
   }
 
-  // throw when an invalid number is provided
+  // Validate number input
   if (typeof number !== "number") {
-    throw new TypeError(
-      `Invalid input: ${number}, expected a JavaScript number`
-    );
+    throw new TypeError(`Invalid input: ${number}, expected a number`);
   }
 
-  const isStringArg = typeof options === "string";
-  const isShortcut = isStringArg && options in SHORTCUT_FORMATS;
-  if (isShortcut) {
-    formatSpecifier = SHORTCUT_FORMATS[options].format;
-  } else if (isStringArg) {
-    formatSpecifier = options;
+  // Handle shortcut formats
+  let formatOptions: ZujiOptions = {};
+  if (typeof options === "string") {
+    if (options in SHORTCUT_FORMATS) {
+      formatOptions = SHORTCUT_FORMATS[options];
+    } else {
+      throw new Error(`Invalid shortcut format: ${options}`);
+    }
   } else {
-    formatSpecifier = generateFormatSpecifier(options);
+    formatOptions = options;
   }
 
-  // use en-US locale by default
-  let locale: SupportedLocale = "en-US";
-  if (!isStringArg && options.locale) {
-    locale = options.locale;
-  }
+  // Create formatter and format the number
+  const formatter = new Intl.NumberFormat(
+    formatOptions.locale || "en-US",
+    formatOptions as Intl.NumberFormatOptions
+  );
 
-  // if the locale is not supported, throw an error
-  if (!locale || !SUPPORTED_LOCALES.includes(locale)) {
-    throw new Error(`Unsupported locale: ${locale}`);
-  }
-
-  // set the locale
-  const localeDefinition = localeDefinitions[locale];
-  const localeObject = formatLocale(localeDefinition as any);
-
-  return localeObject.format(formatSpecifier)(number);
+  return formatter.format(number);
 }
