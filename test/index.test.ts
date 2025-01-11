@@ -293,7 +293,7 @@ describe("sign display", () => {
 });
 
 describe("locale handling", () => {
-  test.only("formats numbers according to locale", () => {
+  test("formats numbers according to locale", () => {
     const number = 1234567.89;
 
     expect(zuji(number, { locale: "en-US" })).toBe("1,234,567.89");
@@ -309,5 +309,53 @@ describe("locale handling", () => {
         currency: "JPY",
       })
     ).toBe("¥1,234,568");
+  });
+});
+
+describe("rounding options", () => {
+  test("roundingMode", () => {
+    expect(zuji(2.5, { roundingMode: "ceil" })).toBe("3");
+    expect(zuji(2.5, { roundingMode: "floor" })).toBe("2");
+    expect(zuji(2.5, { roundingMode: "halfExpand" })).toBe("3");
+    expect(zuji(2.5, { roundingMode: "trunc" })).toBe("2");
+  });
+
+  test("roundingIncrement", () => {
+    expect(zuji(1.23, { roundingIncrement: 5, maximumFractionDigits: 2 })).toBe(
+      "1.25"
+    );
+    expect(zuji(1.22, { roundingIncrement: 5, maximumFractionDigits: 2 })).toBe(
+      "1.20"
+    );
+    expect(zuji(1.27, { roundingIncrement: 5, maximumFractionDigits: 2 })).toBe(
+      "1.25"
+    );
+  });
+
+  test("roundingPriority", () => {
+    expect(
+      zuji(1.234, {
+        maximumSignificantDigits: 3,
+        maximumFractionDigits: 2,
+        roundingPriority: "morePrecision",
+      })
+    ).toBe("1.23");
+    expect(
+      zuji(1.234, {
+        maximumSignificantDigits: 3,
+        maximumFractionDigits: 2,
+        roundingPriority: "lessPrecision",
+      })
+    ).toBe("1.2");
+  });
+
+  test("trailingZeroDisplay", () => {
+    expect(zuji(100.0, { trailingZeroDisplay: "stripIfInteger" })).toBe("100");
+    expect(zuji(100.1, { trailingZeroDisplay: "stripIfInteger" })).toBe(
+      "100.1"
+    );
+    expect(
+      zuji(100.0, { trailingZeroDisplay: "auto", minimumFractionDigits: 2 })
+    ).toBe("100.00");
   });
 });

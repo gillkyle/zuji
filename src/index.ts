@@ -9,6 +9,9 @@ export interface ZujiOptions {
   /** The locale to use for formatting (e.g., "en-US", "fr-FR") */
   locale?: string;
 
+  /** Whether or not to throw an error if there is an issue while parsing */
+  safeMode?: boolean;
+
   // ------------ Style options ------------
   /** The formatting style to use. Possible values are:
    *
@@ -125,6 +128,68 @@ export interface ZujiOptions {
    * - "never" - Never show sign
    */
   signDisplay?: Intl.NumberFormatOptions["signDisplay"];
+
+  // ------------ Rounding options ------------
+  /** How to resolve conflicts between significant digits and fraction digits rounding. Possible values are:
+   *
+   * - "auto" (default) - Use significant digits if specified, otherwise use fraction digits
+   * - "morePrecision" - Use the option that results in more precision
+   * - "lessPrecision" - Use the option that results in less precision
+   */
+  roundingPriority?: "auto" | "morePrecision" | "lessPrecision";
+
+  /** The increment to round to. Possible values are:
+   * 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000
+   * Default: 1
+   *
+   * Note: Cannot be mixed with significant-digits rounding or roundingPriority other than "auto"
+   */
+  roundingIncrement?:
+    | 1
+    | 2
+    | 5
+    | 10
+    | 20
+    | 25
+    | 50
+    | 100
+    | 200
+    | 250
+    | 500
+    | 1000
+    | 2000
+    | 2500
+    | 5000;
+
+  /** How numbers should be rounded. Possible values are:
+   *
+   * - "halfExpand" (default) - Round away from zero at the halfway point
+   * - "ceil" - Round toward positive infinity
+   * - "floor" - Round toward negative infinity
+   * - "expand" - Round away from zero
+   * - "trunc" - Round toward zero
+   * - "halfCeil" - Round toward positive infinity at halfway point
+   * - "halfFloor" - Round toward negative infinity at halfway point
+   * - "halfTrunc" - Round toward zero at halfway point
+   * - "halfEven" - Round toward nearest even number at halfway point
+   */
+  roundingMode?:
+    | "halfExpand"
+    | "ceil"
+    | "floor"
+    | "expand"
+    | "trunc"
+    | "halfCeil"
+    | "halfFloor"
+    | "halfTrunc"
+    | "halfEven";
+
+  /** How trailing zeros in the fraction should be displayed. Possible values are:
+   *
+   * - "auto" (default) - Show trailing zeros according to minimumFractionDigits and minimumSignificantDigits
+   * - "stripIfInteger" - Remove trailing zeros if the number is an integer
+   */
+  trailingZeroDisplay?: "auto" | "stripIfInteger";
 }
 
 /**
@@ -239,6 +304,15 @@ export function zuji(
     formatOptions.locale || "en-US",
     formatOptions as Intl.NumberFormatOptions
   );
+
+  if (formatOptions.safeMode) {
+    try {
+      return formatter.format(number);
+    } catch (error) {
+      console.log("caught error but continuing with original number");
+      return String(number);
+    }
+  }
 
   return formatter.format(number);
 }

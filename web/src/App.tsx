@@ -1,6 +1,6 @@
+import { ApiOption } from "@/components/api-option";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ExampleTable } from "@/components/example-table";
-import { FormatMatrix } from "@/components/format-matrix";
 import { Playground } from "@/components/playground";
 import { ProseContainer } from "@/components/prose-container";
 import {
@@ -82,147 +82,260 @@ const TEST_CASES: Array<TestCase> = [
   },
 ] as const;
 
-const NUMBER_EXAMPLES: Array<TestCase> = [
+const STYLE_EXAMPLES: Array<TestCase> = [
   {
-    value: 10000,
-    options: {
-      comma: true,
-      precision: 4,
-    },
-    description: "Four decimal places",
+    value: 1234.56,
+    options: { style: "decimal" },
+    description: "Basic decimal formatting",
   },
   {
-    value: 10000.23,
-    options: {
-      sign: "+",
-    },
-    description: "Show plus sign",
+    value: 1234.56,
+    options: { style: "currency", currency: "USD" },
+    description: "US Dollar currency",
   },
   {
-    value: 100.1234,
-    options: {
-      comma: true,
-      fill: "0=",
-    },
-    description: "Leading zeros",
+    value: 1234.56,
+    options: { style: "currency", currency: "EUR" },
+    description: "Euro currency",
   },
   {
-    value: 10,
-    options: {
-      comma: true,
-      fill: "0=",
-    },
-    description: "Leading zeros with decimals",
+    value: 0.1234,
+    options: { style: "percent" },
+    description: "Basic percentage",
   },
   {
-    value: 10000.1234,
-    options: { d3format: "0[.]00000" },
-    description: "Optional decimal point",
+    value: 123,
+    options: { style: "unit", unit: "kilometer" },
+    description: "Kilometer unit",
+  },
+  {
+    value: 123,
+    options: { style: "unit", unit: "mile" },
+    description: "Mile unit",
+  },
+  {
+    value: 21,
+    options: { style: "unit", unit: "celsius" },
+    description: "Temperature unit",
+  },
+];
+
+const DIGIT_EXAMPLES: Array<TestCase> = [
+  {
+    value: 1.23,
+    options: { minimumIntegerDigits: 3 },
+    description: "Minimum integer digits (pad with zeros)",
+  },
+  {
+    value: 123,
+    options: { minimumIntegerDigits: 5 },
+    description: "Minimum 5 integer digits",
+  },
+  {
+    value: 1.2,
+    options: { minimumFractionDigits: 3 },
+    description: "Minimum fraction digits (pad with zeros)",
+  },
+  {
+    value: 1.23456,
+    options: { maximumFractionDigits: 2 },
+    description: "Maximum 2 fraction digits (round)",
+  },
+  {
+    value: 1234.5678,
+    options: { minimumSignificantDigits: 6 },
+    description: "Minimum 6 significant digits",
+  },
+  {
+    value: 1234.5678,
+    options: { maximumSignificantDigits: 3 },
+    description: "Maximum 3 significant digits",
+  },
+  {
+    value: 1.23456,
+    options: { minimumFractionDigits: 2, maximumFractionDigits: 4 },
+    description: "Between 2-4 fraction digits",
+  },
+  {
+    value: 123.456,
+    options: { minimumSignificantDigits: 4, maximumSignificantDigits: 6 },
+    description: "Between 4-6 significant digits",
+  },
+];
+
+const SIGN_DISPLAY_EXAMPLES: Array<TestCase> = [
+  {
+    value: 123,
+    options: { signDisplay: "always" },
+    description: "Always show sign",
+  },
+  {
+    value: -123,
+    options: { signDisplay: "always" },
+    description: "Negative with always",
+  },
+  {
+    value: 0,
+    options: { signDisplay: "always" },
+    description: "Zero with always",
+  },
+  {
+    value: -123,
+    options: { signDisplay: "exceptZero" },
+    description: "Negative with zero",
+  },
+  {
+    value: 0,
+    options: { signDisplay: "exceptZero" },
+    description: "Zero with exceptZero",
+  },
+  {
+    value: 123,
+    options: { signDisplay: "exceptZero" },
+    description: "Positive with exceptZero",
+  },
+  {
+    value: -123,
+    options: { signDisplay: "negative" },
+    description: "Show only negative signs",
+  },
+  {
+    value: -123,
+    options: { signDisplay: "never" },
+    description: "Never show signs (negative)",
+  },
+  {
+    value: 123,
+    options: { signDisplay: "never" },
+    description: "Never show signs (positive)",
+  },
+];
+
+const NOTATION_EXAMPLES: Array<TestCase> = [
+  {
+    value: 1234,
+    options: { notation: "scientific" },
+    description: "Scientific notation",
+  },
+  {
+    value: 1234,
+    options: { notation: "compact", compactDisplay: "short" },
+    description: "Compact notation (short)",
+  },
+  {
+    value: 1234,
+    options: { notation: "compact", compactDisplay: "long" },
+    description: "Compact notation (long)",
+  },
+];
+
+const LOCALE_EXAMPLES: Array<TestCase> = [
+  {
+    value: 1234567.89,
+    options: { locale: "en-US" },
+    description: "US English format",
+  },
+  {
+    value: 1234567.89,
+    options: { locale: "de-DE" },
+    description: "German format",
+  },
+  {
+    value: 1234567.89,
+    options: { locale: "fr-FR" },
+    description: "French format",
+  },
+  {
+    value: 1234567.89,
+    options: { locale: "ja-JP" },
+    description: "Japanese format",
+  },
+  {
+    value: 1234567.89,
+    options: { locale: "es-ES" },
+    description: "Spanish format",
+  },
+];
+
+const ROUNDING_EXAMPLES: Array<TestCase> = [
+  {
+    value: 2.5,
+    options: { roundingMode: "ceil" },
+    description: "Round up to nearest integer",
+  },
+  {
+    value: 2.5,
+    options: { roundingMode: "floor" },
+    description: "Round down to nearest integer",
+  },
+  {
+    value: 1.234,
+    options: {
+      maximumSignificantDigits: 3,
+      maximumFractionDigits: 2,
+      roundingPriority: "morePrecision",
+    },
+    description:
+      "Use more precise rounding between significant and fraction digits",
+  },
+  {
+    value: 100.0,
+    options: { trailingZeroDisplay: "stripIfInteger" },
+    description: "Strip trailing zeros for integers",
   },
 ];
 
 const CURRENCY_EXAMPLES: Array<TestCase> = [
   {
-    value: 1000.234,
-    options: { d3format: "$0,0.00" },
-    description: "Standard currency",
+    value: 1234.56,
+    options: { style: "currency", currency: "USD", currencyDisplay: "symbol" },
+    description: "US Dollar with symbol",
   },
   {
-    value: 1000.2,
-    options: { d3format: "0,0[.]00 $" },
-    description: "Currency symbol at end",
+    value: 1234.56,
+    options: { style: "currency", currency: "EUR", currencyDisplay: "code" },
+    description: "Euro with currency code",
   },
   {
-    value: -1000.234,
-    options: { d3format: "($0,0)" },
-    description: "Negative with parentheses",
-  },
-  {
-    value: 1230974,
-    options: { d3format: "($ 0.00 a)" },
-    description: "Abbreviated currency",
+    value: -1234.56,
+    options: { style: "currency", currency: "JPY", currencySign: "accounting" },
+    description: "Japanese Yen with accounting notation",
   },
 ];
 
-const BYTE_EXAMPLES: Array<TestCase> = [
+const UNIT_EXAMPLES: Array<TestCase> = [
   {
-    value: 100,
-    options: { d3format: "0b" },
-    description: "Bytes",
+    value: 123,
+    options: { style: "unit", unit: "kilometer", unitDisplay: "short" },
+    description: "Distance in kilometers (short)",
+  },
+  {
+    value: 21,
+    options: { style: "unit", unit: "celsius", unitDisplay: "narrow" },
+    description: "Temperature in Celsius (narrow)",
   },
   {
     value: 1024,
-    options: { d3format: "0 ib" },
-    description: "Binary bytes with space",
-  },
-  {
-    value: 7884486213,
-    options: { d3format: "0.00b" },
-    description: "Bytes with precision",
-  },
-  {
-    value: 3467479682787,
-    options: { d3format: "0.000 ib" },
-    description: "Binary bytes with precision",
+    options: { style: "unit", unit: "megabyte", unitDisplay: "long" },
+    description: "Digital storage in megabytes (long)",
   },
 ];
 
-const PERCENTAGE_EXAMPLES: Array<TestCase> = [
+const GROUPING_EXAMPLES: Array<TestCase> = [
   {
-    value: 1,
-    options: { d3format: "0%" },
-    description: "Basic percentage",
+    value: 1234567,
+    options: { useGrouping: "always" },
+    description: "Always use grouping separators",
   },
   {
-    value: 0.974878234,
-    options: { d3format: "0.000%" },
-    description: "Three decimal places",
+    value: 1234,
+    options: { useGrouping: "min2" },
+    description: "Use grouping only for 2+ digit groups",
   },
   {
-    value: -0.43,
-    options: { d3format: "0 %" },
-    description: "With space",
-  },
-  {
-    value: 0.43,
-    options: { d3format: "(0.000 %)" },
-    description: "With parentheses",
-  },
-];
-
-const TIME_EXAMPLES: Array<TestCase> = [
-  {
-    value: 25,
-    options: { d3format: "00:00:00" },
-    description: "Seconds",
-  },
-  {
-    value: 238,
-    options: { d3format: "00:00:00" },
-    description: "Minutes and seconds",
-  },
-  {
-    value: 63846,
-    options: { d3format: "00:00:00" },
-    description: "Hours, minutes, and seconds",
-  },
-];
-
-const EXPONENTIAL_EXAMPLES: Array<TestCase> = [
-  {
-    value: 1123456789,
-    options: { d3format: "0,0e+0" },
-    description: "Standard exponential",
-  },
-  {
-    value: 12398734.202,
-    options: { d3format: "0.00e+0" },
-    description: "With decimal precision",
-  },
-  {
-    value: 0.000123987,
-    options: { d3format: "0.000e+0" },
-    description: "Small number exponential",
+    value: 1234567,
+    options: { useGrouping: false },
+    description: "No grouping separators",
   },
 ];
 
@@ -251,9 +364,12 @@ export default function Page() {
               </Breadcrumb>
             </div>
           </header>
-          <div className="flex flex-1 flex-col items-center gap-4 p-16">
+          <div className="flex flex-1 flex-col items-center gap-4 p-4 sm:p-6 md:p-8 lg:p-10">
             <ProseContainer>
-              <h1 className="text-neutral-800 text-mono font-mono text-2xl font-semibold flex items-center justify-center">
+              <h1
+                id="overview"
+                className="text-neutral-800 text-mono font-mono text-2xl font-semibold flex items-center justify-center"
+              >
                 zuji
               </h1>
               <hr className="border-neutral-200 border-dashed" />
@@ -321,37 +437,63 @@ export default function Page() {
             <ProseContainer>
               <h2>Overview</h2>
               <p>
-                zuji aims to be:
+                zuji is a developer friendly API for formatting numbers. It is:
                 <ul>
                   <li>
                     <b>straightforward to pick up</b>, the entire API surface is
-                    a single function + and a few exported types if you need
-                    them
+                    a single function + a few exported types if you need them,
+                    and makes formatting numbers easy
                   </li>
                   <li>
-                    but <b>flexible</b> when you need to configure it
+                    <b>standards based</b>, the API extends the{" "}
+                    <code>Intl.NumberFormat</code> API, which makes the API you
+                    pick up consistent with what is built-in to JavaScript
+                    runtimes
+                  </li>
+                  <li>
+                    <b>comprehensive</b>, the API covers virtually every option
+                    you need to format numbers, and supports every ISO standard
+                    locale out of the box
+                  </li>
+                  <li>
+                    <b>tiny</b>, with <span>zero dependencies</span> and a
+                    single purpose
+                  </li>
+                  <li>
+                    and <b>flexible</b> when you need to configure it further
                   </li>
                 </ul>
                 The design leans into the principle of progressive disclosure.
-                You can start using preconfigured options that are friendly and
-                easy to understand, and tweak options as you need to.
+                You can start using preconfigured{" "}
+                <a href="#shortcuts">shortcuts</a> that are friendly and easy to
+                understand, and tweak options as you need to.
               </p>
             </ProseContainer>
             <ProseContainer>
-              <h2>Format Matrix</h2>
+              <h2>Why zuji?</h2>
               <p>
-                Below is a matrix showing different combinations of formatting
-                options applied to the number 1540.1:
+                Number formatting is a task that is simple on the surface, but
+                becomes increasingly complex when you introduce challenges like
+                supporting different grouping separators (1,000 in US vs 1.000
+                in Spain), currencies ($ vs ¥), notations (1,000,000 vs 1M vs
+                1e6), rounding (0.99 {`->`} 100% vs 0.99 {`->`} 99%), and more.
+              </p>
+              <p>
+                Web APIs set out to conquer many of these challenges, but it
+                takes understanding the large number of options (documented in
+                extra depth on this page) to implement them yourself.
+              </p>
+              <p>
+                zuji gives you a method to cover these problems out of the box.{" "}
+                <b>
+                  You won't have to learn a new formatting grammar or pour
+                  through MDN docs to get it right
+                </b>
+                .
               </p>
             </ProseContainer>
-            <WideContainer>
-              <FormatMatrix />
-            </WideContainer>
-            <WideContainer>
-              <ExampleTable examples={TEST_CASES} />
-            </WideContainer>
             <ProseContainer>
-              <h2>Installation</h2>
+              <h2 id="installation">Installation</h2>
               <p>
                 To use in your own project, install the package:
                 <pre>
@@ -378,77 +520,464 @@ console.log(formattedCurrency); // $100
                 </pre>
               </p>
             </ProseContainer>
-
             <ProseContainer>
-              <h2>Format Types</h2>
-
-              <h3>Numbers</h3>
+              <h2 id="shortcuts">Common Use Cases</h2>
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={TEST_CASES} />
+            </WideContainer>
+            <ProseContainer>
+              <h2 id="api-reference">API Reference</h2>
+              <p></p>
+            </ProseContainer>
+            <ProseContainer>
+              <ApiOption
+                name="style"
+                nativeType="string"
+                description="Control the basic formatting style of the provided number."
+                possibleValues={[
+                  {
+                    value: "decimal",
+                    description:
+                      "Plain number formatting, that will add commas and decimal points.",
+                    default: true,
+                  },
+                  {
+                    value: "currency",
+                    description:
+                      "Currency formatting for with symbols like $ or abbreviations like USD.",
+                  },
+                  {
+                    value: "percent",
+                    description:
+                      "Percentage formatting, that will add a % symbol and convert 0-1 decimals into a percentage.",
+                  },
+                  {
+                    value: "unit",
+                    description:
+                      "Unit formatting, that will add a unit like km, mi, C, F, etc. from sanctioned CLDR units.",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={STYLE_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <h2 id="digit-options">Digit Options</h2>
+              <ApiOption
+                name="minimumIntegerDigits"
+                nativeType="number"
+                description="The minimum number of integer digits to use. Possible values are from 1 to 21. Can be useful for cases like spreadsheets or data grids adding leading zeros."
+                possibleValues={[
+                  {
+                    value: "1-21",
+                    description: "Number between 1 and 21",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="minimumFractionDigits"
+                nativeType="number"
+                description="The minimum number of fraction digits to use. Possible values are from 0 to 20. Useful for cases like spreadsheets or data grids adding trailing zeros."
+                possibleValues={[
+                  {
+                    value: "0-20",
+                    description: "Number between 0 and 20",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="maximumFractionDigits"
+                nativeType="number"
+                description="The maximum number of fraction digits to use. Possible values are from 0 to 20."
+                possibleValues={[
+                  {
+                    value: "0-20",
+                    description: "Number between 0 and 20",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="minimumSignificantDigits"
+                nativeType="number"
+                description="The minimum number of significant digits to use. Possible values are from 1 to 21."
+                possibleValues={[
+                  {
+                    value: "1-21",
+                    description: "Number between 1 and 21",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="maximumSignificantDigits"
+                nativeType="number"
+                description="The maximum number of significant digits to use. Possible values are from 1 to 21."
+                possibleValues={[
+                  {
+                    value: "1-21",
+                    description: "Number between 1 and 21",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={DIGIT_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <ApiOption
+                name="signDisplay"
+                nativeType="string"
+                description="Control when and how number signs are displayed."
+                possibleValues={[
+                  {
+                    value: "auto",
+                    description: "Sign display for negative numbers only",
+                    default: true,
+                  },
+                  {
+                    value: "always",
+                    description: "Always display the sign",
+                  },
+                  {
+                    value: "exceptZero",
+                    description: "Display the sign for all numbers except zero",
+                  },
+                  {
+                    value: "negative",
+                    description: "Display the sign for negative numbers only",
+                  },
+                  {
+                    value: "never",
+                    description: "Never display the sign",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={SIGN_DISPLAY_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <h2 id="notation">Notation</h2>
               <p>
-                Use <code>0</code> for required digits and <code>#</code> for
-                optional digits. Add commas for thousand separators and dots for
-                decimal places.
+                Choose different notations for number display, including
+                scientific, engineering, and compact notations.
               </p>
             </ProseContainer>
-            <div className="w-full max-w-[1400px]">
-              <ExampleTable examples={NUMBER_EXAMPLES} />
-            </div>
-
+            <WideContainer>
+              <ExampleTable examples={NOTATION_EXAMPLES} />
+            </WideContainer>
             <ProseContainer>
-              <h3>Currency</h3>
+              <h2 id="localization">Localization</h2>
               <p>
-                Prefix with <code>$</code> or any currency symbol. Use
-                parentheses for negative values.
+                Format numbers according to different locale conventions using
+                the <code>locale</code> property.
               </p>
             </ProseContainer>
-            <div className="w-full max-w-[1400px]">
+            <WideContainer>
+              <ExampleTable examples={LOCALE_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <ApiOption
+                name="roundingMode"
+                nativeType="string"
+                description="Control how numbers are rounded when they exceed the maximum number of digits."
+                possibleValues={[
+                  {
+                    value: "halfExpand",
+                    description: "Round away from zero at the halfway point",
+                    default: true,
+                  },
+                  {
+                    value: "ceil",
+                    description: "Round toward positive infinity",
+                  },
+                  {
+                    value: "floor",
+                    description: "Round toward negative infinity",
+                  },
+                  {
+                    value: "expand",
+                    description: "Round away from zero",
+                  },
+                  {
+                    value: "trunc",
+                    description: "Round toward zero",
+                  },
+                  {
+                    value: "halfCeil",
+                    description:
+                      "Round toward positive infinity at halfway point",
+                  },
+                  {
+                    value: "halfFloor",
+                    description:
+                      "Round toward negative infinity at halfway point",
+                  },
+                  {
+                    value: "halfTrunc",
+                    description: "Round toward zero at halfway point",
+                  },
+                  {
+                    value: "halfEven",
+                    description:
+                      "Round toward nearest even number at halfway point",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="roundingIncrement"
+                nativeType="number"
+                description="Specify the increment to which numbers should be rounded."
+                possibleValues={[
+                  {
+                    value: "1",
+                    description: "Round to whole numbers",
+                    default: true,
+                  },
+                  {
+                    value: "2, 5, 10, 20, 25, 50, 100, ...",
+                    description: "Round to specified increment",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="roundingPriority"
+                nativeType="string"
+                description="Control how conflicts between significant digits and fraction digits rounding are resolved."
+                possibleValues={[
+                  {
+                    value: "auto",
+                    description:
+                      "Use significant digits if specified, otherwise fraction digits",
+                    default: true,
+                  },
+                  {
+                    value: "morePrecision",
+                    description:
+                      "Use the option that results in more precision",
+                  },
+                  {
+                    value: "lessPrecision",
+                    description:
+                      "Use the option that results in less precision",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="trailingZeroDisplay"
+                nativeType="string"
+                description="Control how trailing zeros in the fraction should be displayed."
+                possibleValues={[
+                  {
+                    value: "auto",
+                    description:
+                      "Show trailing zeros according to minimum digits settings",
+                    default: true,
+                  },
+                  {
+                    value: "stripIfInteger",
+                    description:
+                      "Remove trailing zeros if the number is an integer",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={ROUNDING_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <h2 id="currency-options">Currency Options</h2>
+              <ApiOption
+                name="currency"
+                nativeType="string"
+                description="The currency to use for formatting. Required when style is 'currency'."
+                possibleValues={[
+                  {
+                    value: "USD",
+                    description: "US Dollar",
+                  },
+                  {
+                    value: "EUR",
+                    description: "Euro",
+                  },
+                  {
+                    value: "JPY",
+                    description: "Japanese Yen",
+                  },
+                  // Add more common currencies as needed
+                ]}
+              />
+              <ApiOption
+                name="currencyDisplay"
+                nativeType="string"
+                description="How to display the currency."
+                possibleValues={[
+                  {
+                    value: "symbol",
+                    description: "Use currency symbol (e.g., $)",
+                    default: true,
+                  },
+                  {
+                    value: "narrowSymbol",
+                    description: "Use narrow symbol (e.g., $ instead of US$)",
+                  },
+                  {
+                    value: "code",
+                    description: "Use currency code (e.g., USD)",
+                  },
+                  {
+                    value: "name",
+                    description: "Use currency name (e.g., US Dollar)",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="currencySign"
+                nativeType="string"
+                description="How to handle negative currency values."
+                possibleValues={[
+                  {
+                    value: "standard",
+                    description: "Use minus sign (e.g., -$1.00)",
+                    default: true,
+                  },
+                  {
+                    value: "accounting",
+                    description: "Use accounting notation (e.g., ($1.00))",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
               <ExampleTable examples={CURRENCY_EXAMPLES} />
-            </div>
-
+            </WideContainer>
             <ProseContainer>
-              <h3>Bytes</h3>
-              <p>
-                Use <code>b</code> suffix for automatic byte conversion (B, KB,
-                MB, GB, etc.).
-              </p>
+              <h2 id="unit-options">Unit Options</h2>
+              <ApiOption
+                name="unit"
+                nativeType="string"
+                description="The unit to use for formatting. Required when style is 'unit'."
+                possibleValues={[
+                  {
+                    value: "kilometer",
+                    description: "Distance in kilometers",
+                  },
+                  {
+                    value: "celsius",
+                    description: "Temperature in Celsius",
+                  },
+                  {
+                    value: "megabyte",
+                    description: "Digital storage in megabytes",
+                  },
+                  // Add more common units as needed
+                ]}
+              />
+              <ApiOption
+                name="unitDisplay"
+                nativeType="string"
+                description="How to display the unit."
+                possibleValues={[
+                  {
+                    value: "short",
+                    description: "Short unit formatting (e.g., 16 km)",
+                    default: true,
+                  },
+                  {
+                    value: "narrow",
+                    description: "Narrow unit formatting (e.g., 16km)",
+                  },
+                  {
+                    value: "long",
+                    description: "Long unit formatting (e.g., 16 kilometers)",
+                  },
+                ]}
+              />
             </ProseContainer>
-            <div className="w-full max-w-[1400px]">
-              <ExampleTable examples={BYTE_EXAMPLES} />
-            </div>
-
+            <WideContainer>
+              <ExampleTable examples={UNIT_EXAMPLES} />
+            </WideContainer>
             <ProseContainer>
-              <h3>Percentages</h3>
-              <p>
-                Add <code>%</code> suffix for percentage formatting. Combines
-                well with decimal precision.
-              </p>
+              <h2 id="notation-options">Notation Options</h2>
+              <ApiOption
+                name="notation"
+                nativeType="string"
+                description="The formatting notation to use for the number."
+                possibleValues={[
+                  {
+                    value: "standard",
+                    description: "Plain number formatting",
+                    default: true,
+                  },
+                  {
+                    value: "scientific",
+                    description: "Scientific notation (e.g., 1.23E4)",
+                  },
+                  {
+                    value: "engineering",
+                    description: "Engineering notation (e.g., 12.3E3)",
+                  },
+                  {
+                    value: "compact",
+                    description: "Compact notation (e.g., 12K)",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="compactDisplay"
+                nativeType="string"
+                description="How to display compact numbers. Only used when notation is 'compact'."
+                possibleValues={[
+                  {
+                    value: "short",
+                    description: "Short compact notation (e.g., 12K)",
+                    default: true,
+                  },
+                  {
+                    value: "long",
+                    description: "Long compact notation (e.g., 12 thousand)",
+                  },
+                ]}
+              />
             </ProseContainer>
-            <div className="w-full max-w-[1400px]">
-              <ExampleTable examples={PERCENTAGE_EXAMPLES} />
-            </div>
-
             <ProseContainer>
-              <h3>Time</h3>
-              <p>
-                Use <code>00:00:00</code> format for time representation in
-                hours:minutes:seconds.
-              </p>
+              <h2 id="grouping-options">Grouping Options</h2>
+              <ApiOption
+                name="useGrouping"
+                nativeType="boolean | string"
+                description="Whether and how to use grouping separators."
+                possibleValues={[
+                  {
+                    value: "auto",
+                    description: "Use locale preferences",
+                    default: true,
+                  },
+                  {
+                    value: "always",
+                    description: "Always use grouping separators",
+                  },
+                  {
+                    value: "min2",
+                    description: "Use separators for 2+ digit groups",
+                  },
+                  {
+                    value: "true",
+                    description:
+                      "Same as always, ie always use grouping separators",
+                  },
+                  {
+                    value: "false",
+                    description: "Never use grouping separators",
+                  },
+                ]}
+              />
             </ProseContainer>
-            <div className="w-full max-w-[1400px]">
-              <ExampleTable examples={TIME_EXAMPLES} />
-            </div>
-
+            <WideContainer>
+              <ExampleTable examples={GROUPING_EXAMPLES} />
+            </WideContainer>
             <ProseContainer>
-              <h3>Exponential</h3>
-              <p>
-                Use <code>e+0</code> suffix for scientific notation.
-              </p>
-            </ProseContainer>
-            <div className="w-full max-w-[1400px]">
-              <ExampleTable examples={EXPONENTIAL_EXAMPLES} />
-            </div>
-
-            <ProseContainer>
-              <h2>Interactive Playground</h2>
+              <h2 id="playground">Interactive Playground</h2>
               <p>
                 Use this playground to experiment with different formatting
                 options and see the results in real-time.

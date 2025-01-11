@@ -24,136 +24,67 @@ const data = {
       items: [
         {
           title: "Overview",
-          url: "#",
+          url: "#overview",
+        },
+        {
+          title: "Why zuji?",
+          url: "#why",
         },
         {
           title: "Installation",
-          url: "#",
-        },
-        {
-          title: "Project Structure",
-          url: "#",
+          url: "#installation",
         },
       ],
     },
     {
-      title: "Building Your Application",
-      url: "#",
+      title: "Options API Reference",
+      url: "#api-reference",
       items: [
         {
-          title: "Routing",
-          url: "#",
+          title: "Style Options",
+          url: "#style-options",
         },
         {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
+          title: "Currency Options",
+          url: "#currency-options",
         },
         {
-          title: "Rendering",
-          url: "#",
+          title: "Unit Options",
+          url: "#unit-options",
         },
         {
-          title: "Caching",
-          url: "#",
+          title: "Digit Options",
+          url: "#digit-options",
         },
         {
-          title: "Styling",
-          url: "#",
+          title: "Sign Display",
+          url: "#sign-display",
         },
         {
-          title: "Optimizing",
-          url: "#",
+          title: "Notation Options",
+          url: "#notation-options",
         },
         {
-          title: "Configuring",
-          url: "#",
+          title: "Grouping Options",
+          url: "#grouping-options",
         },
         {
-          title: "Testing",
-          url: "#",
+          title: "Rounding Options",
+          url: "#rounding-options",
         },
         {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
-          url: "#",
+          title: "Localization",
+          url: "#localization",
         },
       ],
     },
     {
-      title: "API Reference",
+      title: "Examples",
       url: "#",
       items: [
         {
-          title: "Components",
-          url: "#",
-        },
-        {
-          title: "File Conventions",
-          url: "#",
-        },
-        {
-          title: "Functions",
-          url: "#",
-        },
-        {
-          title: "next.config.js Options",
-          url: "#",
-        },
-        {
-          title: "CLI",
-          url: "#",
-        },
-        {
-          title: "Edge Runtime",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Architecture",
-      url: "#",
-      items: [
-        {
-          title: "Accessibility",
-          url: "#",
-        },
-        {
-          title: "Fast Refresh",
-          url: "#",
-        },
-        {
-          title: "Next.js Compiler",
-          url: "#",
-        },
-        {
-          title: "Supported Browsers",
-          url: "#",
-        },
-        {
-          title: "Turbopack",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Community",
-      url: "#",
-      items: [
-        {
-          title: "Contribution Guide",
-          url: "#",
+          title: "Interactive Playground",
+          url: "#playground",
         },
       ],
     },
@@ -194,7 +125,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuSub>
                     {item.items.map((item) => (
                       <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild isActive={item.isActive}>
+                        <SidebarMenuSubButton asChild>
                           <a href={item.url}>{item.title}</a>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
