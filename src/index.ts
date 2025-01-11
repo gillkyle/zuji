@@ -1,4 +1,5 @@
 import { ISO417CurrencyCode } from "./currency";
+import { SupportedBCP47Locale } from "./locales";
 import { OneToTwentyOne, SanctionedCLDRUnit, ZeroToTwenty } from "./units";
 
 /**
@@ -7,7 +8,7 @@ import { OneToTwentyOne, SanctionedCLDRUnit, ZeroToTwenty } from "./units";
 export interface ZujiOptions {
   // ------------ General options ------------
   /** The locale to use for formatting (e.g., "en-US", "fr-FR") */
-  locale?: string;
+  locale?: SupportedBCP47Locale;
 
   /** Whether or not to throw an error if there is an issue while parsing */
   safeMode?: boolean;

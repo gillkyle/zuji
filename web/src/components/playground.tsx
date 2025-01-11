@@ -34,9 +34,9 @@ const UNIT_DISPLAY_OPTIONS = [
 ] as const;
 
 const NOTATION_OPTIONS = [
-  { value: "standard", label: "Standard" },
-  { value: "scientific", label: "Scientific (1.23E4)" },
-  { value: "engineering", label: "Engineering (12.3E3)" },
+  { value: "standard", label: "Standard (1200)" },
+  { value: "scientific", label: "Scientific (1.2E3)" },
+  { value: "engineering", label: "Engineering (12E2)" },
   { value: "compact", label: "Compact (12K)" },
 ] as const;
 
@@ -92,6 +92,10 @@ interface NumberEntry {
   value: string;
 }
 
+const POSSIBLE_NEW_NUMBERS = [
+  0.15, 10.33, 150, 1000, 53237, 120000, 250000, 1000000, 1234567890,
+];
+
 export function Playground() {
   const [numbers, setNumbers] = useState<NumberEntry[]>([
     { id: crypto.randomUUID(), value: "1234.56" },
@@ -105,7 +109,13 @@ export function Playground() {
   });
 
   const addNumber = () => {
-    setNumbers((prev) => [...prev, { id: crypto.randomUUID(), value: "0" }]);
+    // choose a different number than one already present
+    const newNumber =
+      POSSIBLE_NEW_NUMBERS[numbers.length % POSSIBLE_NEW_NUMBERS.length];
+    setNumbers((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), value: newNumber.toString() },
+    ]);
   };
 
   const updateNumber = (id: string, value: string) => {
@@ -143,12 +153,12 @@ export function Playground() {
 
   const { copied, handleCopy } = useCopy(generatedCode);
   return (
-    <div className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-6">
+    <div className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-4">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Playground</h3>
         <button
           onClick={addNumber}
-          className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 rounded-md flex items-center gap-1"
+          className="px-2 bg-neutral-100 hover:bg-neutral-200 rounded-md flex items-center gap-1"
         >
           <span>Add Number</span>
           <span className="text-lg">+</span>
@@ -156,26 +166,30 @@ export function Playground() {
       </div>
 
       {/* Number inputs and outputs */}
-      <div className="space-y-3 mb-6">
-        {numbers.map((num) => (
+      <div className="space-y-2 mb-4">
+        {numbers.map((num, index) => (
           <div key={num.id} className="flex gap-4 items-center">
-            <div className="flex-1 flex gap-4">
+            <div className="flex-1 flex gap-2">
               <Input
                 value={num.value}
                 onChange={(e) => updateNumber(num.id, e.target.value)}
                 placeholder="Enter a number..."
-                className="flex-1"
+                className="flex-1 h-9"
               />
-              <div className="flex-1 bg-white p-2 border rounded-md font-mono">
+              <div className="h-9 flex-1 bg-neutral-100 p-2 border rounded-md font-mono flex items-center justify-end">
                 {zuji(Number(num.value), { ...options, safeMode: true })}
               </div>
             </div>
-            <button
-              onClick={() => removeNumber(num.id)}
-              className="text-neutral-500 hover:text-red-500"
-            >
-              ×
-            </button>
+            {index > 0 ? (
+              <button
+                onClick={() => removeNumber(num.id)}
+                className="text-neutral-500 hover:text-red-500 w-4"
+              >
+                ×
+              </button>
+            ) : (
+              <div className="w-4 h-4" />
+            )}
           </div>
         ))}
       </div>

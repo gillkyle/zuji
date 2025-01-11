@@ -658,21 +658,63 @@ console.log(formattedCurrency); // $100
               <ExampleTable examples={SIGN_DISPLAY_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
-              <h2 id="notation">Notation</h2>
-              <p>
-                Choose different notations for number display, including
-                scientific, engineering, and compact notations.
-              </p>
+              <ApiOption
+                name="notation"
+                nativeType="string"
+                description="Choose different notations for number display."
+                possibleValues={[
+                  {
+                    value: "standard",
+                    description: "Standard decimal notation",
+                    default: true,
+                  },
+                  {
+                    value: "scientific",
+                    description: "Scientific notation (e.g. 1.23e4)",
+                  },
+                  {
+                    value: "engineering",
+                    description: "Engineering notation (e.g. 12.3E3)",
+                  },
+                  {
+                    value: "compact",
+                    description: "Compact notation (e.g. 1K, 1M, 1B)",
+                  },
+                ]}
+              />
             </ProseContainer>
             <WideContainer>
               <ExampleTable examples={NOTATION_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
-              <h2 id="localization">Localization</h2>
-              <p>
-                Format numbers according to different locale conventions using
-                the <code>locale</code> property.
-              </p>
+              <ApiOption
+                name="locale"
+                nativeType="string"
+                description="Format numbers according to different locale conventions. Possible values are any valid ISO 4217 locale. A few examples are provided below. zuji will automatically find the best fit locale if one is not specified."
+                possibleValues={[
+                  {
+                    value: "en-US",
+                    description: "US English format",
+                    default: true,
+                  },
+                  {
+                    value: "de-DE",
+                    description: "German format",
+                  },
+                  {
+                    value: "fr-FR",
+                    description: "French format",
+                  },
+                  {
+                    value: "ja-JP",
+                    description: "Japanese format",
+                  },
+                  {
+                    value: "es-ES",
+                    description: "Spanish format",
+                  },
+                ]}
+              />
             </ProseContainer>
             <WideContainer>
               <ExampleTable examples={LOCALE_EXAMPLES} />
