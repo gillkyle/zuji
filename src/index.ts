@@ -197,7 +197,7 @@ export interface ZujiOptions {
  * Predefined number formatting shortcuts
  */
 const SHORTCUT_FORMATS: Record<string, ZujiOptions> = {
-  "small-currency": {
+  "compact-currency": {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,

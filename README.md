@@ -1,6 +1,6 @@
 # Zuji
 
-A lightweight number formatting utility built on top of d3-format.
+A lightweight number formatting utility built on top of `Intl.NumberFormat`.
 
 ## Installation
 
