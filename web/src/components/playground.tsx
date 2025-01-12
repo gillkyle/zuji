@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -8,8 +9,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCopy } from "@/hooks/use-copy";
-import { ClipboardCheckIcon, ClipboardCopyIcon } from "lucide-react";
-import { useState } from "react";
+import { SelectSeparator } from "@radix-ui/react-select";
+import { ClipboardCheckIcon, ClipboardCopyIcon, XIcon } from "lucide-react";
+import React, { useState } from "react";
 import { zuji, type ZujiOptions } from "../../../src/index";
 import { ZeroToTwenty } from "../../../src/units";
 
@@ -18,32 +20,32 @@ const STYLE_OPTIONS = [
   { value: "currency", label: "Currency" },
   { value: "percent", label: "Percent" },
   { value: "unit", label: "Unit" },
-] as const;
+];
 
 const CURRENCY_DISPLAY_OPTIONS = [
   { value: "symbol", label: "Symbol ($)" },
   { value: "narrowSymbol", label: "Narrow Symbol" },
   { value: "code", label: "Code (USD)" },
   { value: "name", label: "Name (US Dollar)" },
-] as const;
+];
 
 const UNIT_DISPLAY_OPTIONS = [
   { value: "short", label: "Short (16 l)" },
   { value: "narrow", label: "Narrow (16l)" },
   { value: "long", label: "Long (16 liters)" },
-] as const;
+];
 
 const NOTATION_OPTIONS = [
   { value: "standard", label: "Standard (1200)" },
   { value: "scientific", label: "Scientific (1.2E3)" },
   { value: "engineering", label: "Engineering (12E2)" },
   { value: "compact", label: "Compact (12K)" },
-] as const;
+];
 
 const COMPACT_DISPLAY_OPTIONS = [
   { value: "short", label: "Short (12K)" },
   { value: "long", label: "Long (12 thousand)" },
-] as const;
+];
 
 const SIGN_DISPLAY_OPTIONS = [
   { value: "auto", label: "Auto (negative only)" },
@@ -51,12 +53,12 @@ const SIGN_DISPLAY_OPTIONS = [
   { value: "exceptZero", label: "Except Zero" },
   { value: "negative", label: "Negative Only" },
   { value: "never", label: "Never" },
-] as const;
+];
 
 const CURRENCY_SIGN_OPTIONS = [
   { value: "standard", label: "Standard (-$1.00)" },
   { value: "accounting", label: "Accounting (($1.00))" },
-] as const;
+];
 
 const COMMON_UNITS = [
   { value: "kilometer", label: "Kilometers" },
@@ -68,7 +70,7 @@ const COMMON_UNITS = [
   { value: "kilogram", label: "Kilograms" },
   { value: "pound", label: "Pounds" },
   { value: "byte", label: "Bytes" },
-] as const;
+];
 
 const COMMON_CURRENCIES = [
   { value: "USD", label: "US Dollar" },
@@ -76,7 +78,7 @@ const COMMON_CURRENCIES = [
   { value: "GBP", label: "British Pound" },
   { value: "JPY", label: "Japanese Yen" },
   { value: "CNY", label: "Chinese Yuan" },
-] as const;
+];
 
 const COMMON_LOCALES = [
   { value: "en-US", label: "English (US)" },
@@ -85,7 +87,7 @@ const COMMON_LOCALES = [
   { value: "de-DE", label: "German" },
   { value: "ja-JP", label: "Japanese" },
   { value: "zh-CN", label: "Chinese" },
-] as const;
+];
 
 interface NumberEntry {
   id: string;
@@ -97,44 +99,61 @@ const POSSIBLE_NEW_NUMBERS = [
 ];
 
 export function Playground() {
-  const [numbers, setNumbers] = useState<NumberEntry[]>([
+  const [playgroundNumbers, setPlaygroundNumbers] = useState<NumberEntry[]>([
     { id: crypto.randomUUID(), value: "1234.56" },
   ]);
-  const [options, setOptions] = useState<ZujiOptions>({
-    style: "decimal",
-    notation: "standard",
-    signDisplay: "auto",
-    locale: "en-US",
+  const [zujiOptions, setZujiOptions] = useState<Partial<ZujiOptions>>({
+    notation: "compact",
+    compactDisplay: "short",
+    style: undefined,
+    signDisplay: undefined,
+    locale: undefined,
     safeMode: true,
+    // set a couple options that need to be set when a different style is selected so they don't error on us
+    currency: "USD",
+    unit: "terabyte",
   });
 
   const addNumber = () => {
+    // if we've already got 10 numbers, don't add any more
+    if (playgroundNumbers.length >= 10) return;
     // choose a different number than one already present
     const newNumber =
-      POSSIBLE_NEW_NUMBERS[numbers.length % POSSIBLE_NEW_NUMBERS.length];
-    setNumbers((prev) => [
+      POSSIBLE_NEW_NUMBERS[
+        playgroundNumbers.length % POSSIBLE_NEW_NUMBERS.length
+      ];
+    setPlaygroundNumbers((prev) => [
       ...prev,
       { id: crypto.randomUUID(), value: newNumber.toString() },
     ]);
   };
 
   const updateNumber = (id: string, value: string) => {
-    setNumbers((prev) =>
+    setPlaygroundNumbers((prev) =>
       prev.map((num) => (num.id === id ? { ...num, value } : num))
     );
   };
 
   const removeNumber = (id: string) => {
-    setNumbers((prev) => {
+    setPlaygroundNumbers((prev) => {
       if (prev.length <= 1) return prev;
       return prev.filter((num) => num.id !== id);
     });
   };
 
-  const firstNumber = numbers[0].value;
-  const relevantOptions = Object.entries(options).reduce(
+  const firstNumber = playgroundNumbers[0].value;
+  const relevantOptions = Object.entries(zujiOptions).reduce(
     (acc, [key, value]) => {
-      if (value !== undefined && value !== "" && key !== "safeMode") {
+      if (
+        value !== undefined &&
+        key !== "safeMode" &&
+        // Don't include style if it's decimal since that's the default
+        !(key === "style" && value === "decimal") &&
+        // Don't include notation if it's standard since that's the default
+        !(key === "notation" && value === "standard") &&
+        // Don't include signDisplay if it's auto since that's the default
+        !(key === "signDisplay" && value === "auto")
+      ) {
         acc[key] = value;
       }
       return acc;
@@ -148,8 +167,8 @@ export function Playground() {
 
   const generatedCode = `import { zuji } from "zuji";
   
-  const formattedNumber = zuji(${firstNumber}${optionsStr});
-  // => ${zuji(Number(firstNumber), { ...options, safeMode: true })}`;
+const formattedNumber = zuji(${firstNumber}${optionsStr});
+// => ${zuji(Number(firstNumber), { ...zujiOptions, safeMode: true })}`;
 
   const { copied, handleCopy } = useCopy(generatedCode);
   return (
@@ -160,14 +179,14 @@ export function Playground() {
           onClick={addNumber}
           className="px-2 bg-neutral-100 hover:bg-neutral-200 rounded-md flex items-center gap-1"
         >
-          <span>Add Number</span>
+          <span>Add Test Case</span>
           <span className="text-lg">+</span>
         </button>
       </div>
 
       {/* Number inputs and outputs */}
       <div className="space-y-2 mb-4">
-        {numbers.map((num, index) => (
+        {playgroundNumbers.map((num, index) => (
           <div key={num.id} className="flex gap-4 items-center">
             <div className="flex-1 flex gap-2">
               <Input
@@ -176,8 +195,11 @@ export function Playground() {
                 placeholder="Enter a number..."
                 className="flex-1 h-9"
               />
-              <div className="h-9 flex-1 bg-neutral-100 p-2 border rounded-md font-mono flex items-center justify-end">
-                {zuji(Number(num.value), { ...options, safeMode: true })}
+              <div className="h-9 flex-1 bg-white p-2 border rounded-md flex items-center justify-end relative">
+                <span className="text-neutral-300 absolute left-2 top-1/2 -translate-y-1/2">
+                  →
+                </span>
+                {zuji(Number(num.value), { ...zujiOptions, safeMode: true })}
               </div>
             </div>
             {index > 0 ? (
@@ -195,194 +217,163 @@ export function Playground() {
       </div>
 
       {/* Options Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Style Options */}
-        <div className="space-y-2">
-          <Label htmlFor="style">Format Style</Label>
-          <Select
-            value={options.style}
-            onValueChange={(value) =>
-              setOptions((prev) => ({
-                ...prev,
-                style: value as ZujiOptions["style"],
-              }))
-            }
-          >
-            <SelectTrigger id="style">
-              <SelectValue placeholder="Select style" />
-            </SelectTrigger>
-            <SelectContent>
-              {STYLE_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <ClearableSelect
+          value={zujiOptions.style}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              style: value as ZujiOptions["style"],
+            }))
+          }
+          apiOptionName="style"
+          placeholder="Select style"
+          options={STYLE_OPTIONS}
+        />
 
-        {/* Currency/Unit specific options */}
-        {options.style === "currency" && (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
-              <Select
-                value={options.currency}
-                onValueChange={(value) =>
-                  setOptions((prev) => ({
-                    ...prev,
-                    currency: value as ZujiOptions["currency"],
-                  }))
-                }
-              >
-                <SelectTrigger id="currency">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COMMON_CURRENCIES.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        {/* Unit options */}
+        <ClearableSelect
+          value={zujiOptions.unit}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              unit: value as ZujiOptions["unit"],
+            }))
+          }
+          apiOptionName="unit"
+          placeholder="Select unit"
+          options={COMMON_UNITS}
+          disabled={zujiOptions.style !== "unit"}
+        />
 
-            <div className="space-y-2">
-              <Label htmlFor="currencyDisplay">Display</Label>
-              <Select
-                value={options.currencyDisplay}
-                onValueChange={(value) =>
-                  setOptions((prev) => ({
-                    ...prev,
-                    currencyDisplay: value as ZujiOptions["currencyDisplay"],
-                  }))
-                }
-              >
-                <SelectTrigger id="currencyDisplay">
-                  <SelectValue placeholder="Select display" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCY_DISPLAY_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </>
-        )}
+        <ClearableSelect
+          value={zujiOptions.unitDisplay}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              unitDisplay: value as ZujiOptions["unitDisplay"],
+            }))
+          }
+          apiOptionName="unitDisplay"
+          placeholder="Select display"
+          options={UNIT_DISPLAY_OPTIONS}
+          disabled={zujiOptions.style !== "unit"}
+        />
 
-        {options.style === "unit" && (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="unit">Unit</Label>
-              <Select
-                value={options.unit}
-                onValueChange={(value) =>
-                  setOptions((prev) => ({
-                    ...prev,
-                    unit: value as ZujiOptions["unit"],
-                  }))
-                }
-              >
-                <SelectTrigger id="unit">
-                  <SelectValue placeholder="Select unit" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COMMON_UNITS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </>
-        )}
+        {/* Currency options */}
+        <ClearableSelect
+          value={zujiOptions.currency}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              currency: value as ZujiOptions["currency"],
+            }))
+          }
+          apiOptionName="currency"
+          placeholder="Select currency"
+          options={COMMON_CURRENCIES}
+          disabled={zujiOptions.style !== "currency"}
+        />
+
+        <ClearableSelect
+          value={zujiOptions.currencyDisplay}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              currencyDisplay: value as ZujiOptions["currencyDisplay"],
+            }))
+          }
+          apiOptionName="currencyDisplay"
+          placeholder="Select display"
+          options={CURRENCY_DISPLAY_OPTIONS}
+          disabled={zujiOptions.style !== "currency"}
+        />
+
+        {/* Currency Sign */}
+        <ClearableSelect
+          value={zujiOptions.currencySign}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              currencySign: value as ZujiOptions["currencySign"],
+            }))
+          }
+          apiOptionName="currencySign"
+          placeholder="Select sign style"
+          options={CURRENCY_SIGN_OPTIONS}
+          disabled={zujiOptions.style !== "currency"}
+        />
 
         {/* Common options */}
-        <div className="space-y-2">
-          <Label htmlFor="notation">Notation</Label>
-          <Select
-            value={options.notation}
-            onValueChange={(value) =>
-              setOptions((prev) => ({
-                ...prev,
-                notation: value as ZujiOptions["notation"],
-              }))
-            }
-          >
-            <SelectTrigger id="notation">
-              <SelectValue placeholder="Select notation" />
-            </SelectTrigger>
-            <SelectContent>
-              {NOTATION_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <ClearableSelect
+          value={zujiOptions.notation}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              notation: value as ZujiOptions["notation"],
+            }))
+          }
+          apiOptionName="notation"
+          placeholder="Select notation"
+          options={NOTATION_OPTIONS}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="signDisplay">Sign Display</Label>
-          <Select
-            value={options.signDisplay}
-            onValueChange={(value) =>
-              setOptions((prev) => ({
-                ...prev,
-                signDisplay: value as ZujiOptions["signDisplay"],
-              }))
-            }
-          >
-            <SelectTrigger id="signDisplay">
-              <SelectValue placeholder="Select sign display" />
-            </SelectTrigger>
-            <SelectContent>
-              {SIGN_DISPLAY_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Compact Display */}
+        <ClearableSelect
+          value={zujiOptions.compactDisplay}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              compactDisplay: value as ZujiOptions["compactDisplay"],
+            }))
+          }
+          apiOptionName="compactDisplay"
+          placeholder="Select compact display"
+          options={COMPACT_DISPLAY_OPTIONS}
+          disabled={zujiOptions.notation !== "compact"}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="locale">Locale</Label>
-          <Select
-            value={options.locale}
-            onValueChange={(value) =>
-              setOptions((prev) => ({ ...prev, locale: value }))
-            }
-          >
-            <SelectTrigger id="locale">
-              <SelectValue placeholder="Select locale" />
-            </SelectTrigger>
-            <SelectContent>
-              {COMMON_LOCALES.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <ClearableSelect
+          value={zujiOptions.signDisplay}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              signDisplay: value as ZujiOptions["signDisplay"],
+            }))
+          }
+          apiOptionName="signDisplay"
+          placeholder="Select sign display"
+          options={SIGN_DISPLAY_OPTIONS}
+        />
+
+        <ClearableSelect
+          value={zujiOptions.locale}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              locale: value as ZujiOptions["locale"],
+            }))
+          }
+          apiOptionName="locale"
+          placeholder="Select locale"
+          options={COMMON_LOCALES}
+        />
 
         {/* Fraction digits */}
         <div className="space-y-2">
-          <Label htmlFor="minimumFractionDigits">Min Fraction Digits</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="minimumFractionDigits">minimumFractionDigits</Label>
+          </div>
           <Input
             id="minimumFractionDigits"
             type="number"
             min={0}
             max={20}
-            value={options.minimumFractionDigits || ""}
+            className="h-9 my-0"
+            value={zujiOptions.minimumFractionDigits || ""}
             onChange={(e) =>
-              setOptions((prev) => ({
+              setZujiOptions((prev) => ({
                 ...prev,
                 minimumFractionDigits: e.target.value
                   ? (Number(e.target.value) as ZeroToTwenty)
@@ -393,15 +384,18 @@ export function Playground() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="maximumFractionDigits">Max Fraction Digits</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="maximumFractionDigits">maximumFractionDigits</Label>
+          </div>
           <Input
             id="maximumFractionDigits"
             type="number"
             min={0}
             max={20}
-            value={options.maximumFractionDigits || ""}
+            className="h-9 my-0"
+            value={zujiOptions.maximumFractionDigits || ""}
             onChange={(e) =>
-              setOptions((prev) => ({
+              setZujiOptions((prev) => ({
                 ...prev,
                 maximumFractionDigits: e.target.value
                   ? (Number(e.target.value) as ZeroToTwenty)
@@ -431,9 +425,85 @@ export function Playground() {
             Copy to Clipboard
           </button>
         </div>
-        <pre className="bg-white p-4 rounded-lg border overflow-x-auto">
+        <pre className="bg-neutral-800 text-white p-4 rounded-lg border overflow-x-auto">
           <code className="text-sm">{generatedCode}</code>
         </pre>
+      </div>
+    </div>
+  );
+}
+
+export function ClearableSelect({
+  apiOptionName,
+  value,
+  options,
+  onValueChange,
+  placeholder,
+  disabled = false,
+}: {
+  apiOptionName: string;
+  value: string | undefined;
+  options: Array<{ value: string; label: string }>;
+  onValueChange: (value: string | undefined) => void;
+  placeholder: string;
+  disabled?: boolean;
+}) {
+  const [key, setKey] = React.useState(0);
+
+  return (
+    <div className="space-y-2" key={key}>
+      <div className="flex items-center gap-2">
+        <Label
+          htmlFor={apiOptionName}
+          className={disabled ? "text-neutral-600" : ""}
+        >
+          {apiOptionName}
+        </Label>
+        <a
+          href={`#${apiOptionName}-options`}
+          className="text-xs text-neutral-400 hover:text-neutral-600"
+        >
+          docs
+        </a>
+      </div>
+      <div className="flex items-center gap-1">
+        <Select value={value} onValueChange={onValueChange} disabled={disabled}>
+          <SelectTrigger
+            id={apiOptionName}
+            // className={disabled ? "opacity-50" : ""}
+            className={`
+              ${disabled ? "bg-[url('data:image/svg+xml,%3Csvg%20width%3D%276%27%20height%3D%276%27%20viewBox%3D%270%200%206%206%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%3E%3Cg%20fill%3D%27%239C92AC%27%20fill-opacity%3D%270.4%27%20fill-rule%3D%27evenodd%27%3E%3Cpath%20d%3D%27M5%200h1L0%206V5zM6%205v1H5z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E')]" : ""}`}
+          >
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {value && (
+          <>
+            <SelectSeparator />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                onValueChange(undefined);
+                setKey(key + 1);
+              }}
+              disabled={disabled}
+              className={`
+                ${disabled ? "opacity-50" : ""}
+                h-9
+              `}
+            >
+              <XIcon size={16} />
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

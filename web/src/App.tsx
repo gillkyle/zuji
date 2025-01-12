@@ -3,14 +3,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ExampleTable } from "@/components/example-table";
 import { Playground } from "@/components/playground";
 import { ProseContainer } from "@/components/prose-container";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -20,6 +13,7 @@ import {
 import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
 import { WideContainer } from "@/components/wide-container";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
+import { ExternalLinkIcon } from "lucide-react";
 import { type ZujiOptions, type ZujiShortcut } from "../../src/index";
 
 type TestCase = {
@@ -346,26 +340,37 @@ export default function Page() {
         <AppSidebar />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-            <div className="flex items-center gap-2 px-3">
-              <SidebarTrigger />
-              <Separator orientation="vertical" className="mr-2 h-4" />
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="#">
-                      Building Your Application
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
+            <div className="flex items-center gap-2 px-3 justify-between w-full">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <div className="text-neutral-800 font-mono font-semibold">
+                  千 zuji
+                </div>
+              </div>
+              <a href="https://github.com/zuji-js/zuji">
+                <Button variant="secondary">
+                  <svg
+                    height="32"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    version="1.1"
+                    width="32"
+                    data-view-component="true"
+                  >
+                    <path d="M12.5.75C6.146.75 1 5.896 1 12.25c0 5.089 3.292 9.387 7.863 10.91.575.101.79-.244.79-.546 0-.273-.014-1.178-.014-2.142-2.889.532-3.636-.704-3.866-1.35-.13-.331-.69-1.352-1.18-1.625-.402-.216-.977-.748-.014-.762.906-.014 1.553.834 1.769 1.179 1.035 1.74 2.688 1.25 3.349.948.1-.747.402-1.25.733-1.538-2.559-.287-5.232-1.279-5.232-5.678 0-1.25.445-2.285 1.178-3.09-.115-.288-.517-1.467.115-3.048 0 0 .963-.302 3.163 1.179.92-.259 1.897-.388 2.875-.388.977 0 1.955.13 2.875.388 2.2-1.495 3.162-1.179 3.162-1.179.633 1.581.23 2.76.115 3.048.733.805 1.179 1.825 1.179 3.09 0 4.413-2.688 5.39-5.247 5.678.417.36.776 1.05.776 2.128 0 1.538-.014 2.774-.014 3.162 0 .302.216.662.79.547C20.709 21.637 24 17.324 24 12.25 24 5.896 18.854.75 12.5.75Z"></path>
+                  </svg>
+                  GitHub
+                  <ExternalLinkIcon size={16} />
+                </Button>
+              </a>
             </div>
           </header>
           <div className="flex flex-1 flex-col items-center gap-4 p-4 sm:p-6 md:p-8 lg:p-10">
             <ProseContainer>
+              <div className="flex items-center justify-center gap-2 text-lg my-2">
+                千
+              </div>
               <h1
                 id="overview"
                 className="text-neutral-800 text-mono font-mono text-2xl font-semibold flex items-center justify-center"
@@ -373,7 +378,7 @@ export default function Page() {
                 zuji
               </h1>
               <hr className="border-neutral-200 border-dashed" />
-              <h2 className="text-neutral-900 font-normal text-xl">
+              <h2 className="text-neutral-900 font-semibold text-xl">
                 TypeScript first, human-readable numeric formatting
               </h2>
               <p>zuji is a single function that takes two arguments:</p>
@@ -513,15 +518,27 @@ export default function Page() {
                   <code>
                     {`import { zuji } from "zuji";
 
-const formattedCurrency = zuji(100, "short-currency");
-console.log(formattedCurrency); // $100
+const formattedCurrency = zuji(1000);
+console.log(formattedCurrency); // 1,000
 `}
                   </code>
                 </pre>
               </p>
             </ProseContainer>
             <ProseContainer>
-              <h2 id="shortcuts">Common Use Cases</h2>
+              <h2 id="shortcuts">Shortcuts</h2>
+              <p>
+                The easiest way to format numbers is to use the pre-configured
+                shortcuts zuji offers.
+              </p>
+              <p>
+                A shortcut is simply a string that maps to a combination of
+                options that will be applied automatically. These shortcuts
+                cover the most common use cases for number formatting. If your
+                case extends beyond these, you can use the{" "}
+                <a href="#api-reference">API Reference</a> to configure the
+                options yourself.
+              </p>
             </ProseContainer>
             <WideContainer>
               <ExampleTable examples={TEST_CASES} />
@@ -1022,10 +1039,56 @@ console.log(formattedCurrency); // $100
               <h2 id="playground">Interactive Playground</h2>
               <p>
                 Use this playground to experiment with different formatting
-                options and see the results in real-time.
+                options and see the results in real-time. Add additional test
+                cases to see how options work on different numbers.
               </p>
             </ProseContainer>
             <Playground />
+            <footer className="bg-white mt-8">
+              <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between">
+                <div className="flex justify-center space-x-6 md:order-2">
+                  <a
+                    target="_blank"
+                    href="https://github.com/gillkyle/zuji"
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    <span className="sr-only">GitHub</span>
+                    <svg
+                      className="h-6 w-6"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </a>
+                  <a
+                    target="_blank"
+                    href="https://twitter.com/gill_kyle"
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    <span className="sr-only">Twitter</span>
+                    <svg
+                      className="h-6 w-6"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                    </svg>
+                  </a>
+                </div>
+                <div className="mt-8 md:order-1 md:mt-0 px-6">
+                  <p className="text-center text-sm leading-5 text-gray-500">
+                    &copy; {new Date().getFullYear()} All rights reserved.
+                  </p>
+                </div>
+              </div>
+            </footer>
           </div>
         </SidebarInset>
       </SidebarProvider>

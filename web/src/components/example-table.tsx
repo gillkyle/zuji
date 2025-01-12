@@ -38,13 +38,13 @@ export function ExampleTable({ examples }: ExampleTableProps) {
           <tbody className="bg-white dark:bg-slate-800">
             {examples.map((example, index) => (
               <tr key={index}>
-                <td className="border-t border-b border-slate-200 p-3 text-neutral-700 dark:text-neutral-400">
+                <td className="border-t border-b border-neutral-200 border-dashed p-3 text-neutral-700 dark:text-neutral-400">
                   {example.value}
                 </td>
-                <td className="border-t border-b border-slate-200 p-3 text-neutral-500 dark:text-neutral-400">
+                <td className="border-t border-b border-neutral-200 border-dashed p-3 text-neutral-500 dark:text-neutral-400">
                   {example.description}
                 </td>
-                <td className="border-t border-b border-slate-200 p-3 text-neutral-500 dark:text-neutral-400 font-mono min-w-48">
+                <td className="border-t border-b border-neutral-200 border-dashed p-3 text-neutral-500 dark:text-neutral-400 font-mono min-w-48">
                   <Copyable
                     text={
                       example.options === null
@@ -77,7 +77,7 @@ export function ExampleTable({ examples }: ExampleTableProps) {
                     )}
                   </Copyable>
                 </td>
-                <td className="border-t border-b border-slate-200 p-3 font-semibold text-neutral-700 dark:text-neutral-400">
+                <td className="border-t border-b border-neutral-200 border-dashed p-3 font-semibold text-neutral-700 dark:text-neutral-400">
                   {zuji(example.value, example.options)}
                 </td>
               </tr>
