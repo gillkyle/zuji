@@ -141,11 +141,21 @@ export function Playground() {
     });
   };
 
+  const unitIsDisabled = zujiOptions.style !== "unit";
+  const currencyIsDisabled = zujiOptions.style !== "currency";
+  const compactIsDisabled = zujiOptions.notation !== "compact";
+  const signDisplayIsDisabled = zujiOptions.signDisplay !== "auto";
+
   const firstNumber = playgroundNumbers[0].value;
   const relevantOptions = Object.entries(zujiOptions).reduce(
     (acc, [key, value]) => {
       if (
         value !== undefined &&
+        // value isn't disabled
+        !(unitIsDisabled && key === "unit") &&
+        !(currencyIsDisabled && key === "currency") &&
+        !(compactIsDisabled && key === "compactDisplay") &&
+        !(signDisplayIsDisabled && key === "signDisplay") &&
         key !== "safeMode" &&
         // Don't include style if it's decimal since that's the default
         !(key === "style" && value === "decimal") &&
@@ -244,7 +254,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           apiOptionName="unit"
           placeholder="Select unit"
           options={COMMON_UNITS}
-          disabled={zujiOptions.style !== "unit"}
+          disabled={unitIsDisabled}
         />
 
         <ClearableSelect
@@ -258,7 +268,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           apiOptionName="unitDisplay"
           placeholder="Select display"
           options={UNIT_DISPLAY_OPTIONS}
-          disabled={zujiOptions.style !== "unit"}
+          disabled={unitIsDisabled}
         />
 
         {/* Currency options */}
@@ -273,7 +283,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           apiOptionName="currency"
           placeholder="Select currency"
           options={COMMON_CURRENCIES}
-          disabled={zujiOptions.style !== "currency"}
+          disabled={currencyIsDisabled}
         />
 
         <ClearableSelect
@@ -287,7 +297,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           apiOptionName="currencyDisplay"
           placeholder="Select display"
           options={CURRENCY_DISPLAY_OPTIONS}
-          disabled={zujiOptions.style !== "currency"}
+          disabled={currencyIsDisabled}
         />
 
         {/* Currency Sign */}
@@ -302,7 +312,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           apiOptionName="currencySign"
           placeholder="Select sign style"
           options={CURRENCY_SIGN_OPTIONS}
-          disabled={zujiOptions.style !== "currency"}
+          disabled={currencyIsDisabled}
         />
 
         {/* Common options */}
@@ -331,7 +341,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           apiOptionName="compactDisplay"
           placeholder="Select compact display"
           options={COMPACT_DISPLAY_OPTIONS}
-          disabled={zujiOptions.notation !== "compact"}
+          disabled={compactIsDisabled}
         />
 
         <ClearableSelect
