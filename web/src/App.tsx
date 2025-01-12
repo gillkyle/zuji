@@ -25,11 +25,6 @@ type TestCase = {
 const TEST_CASES: Array<TestCase> = [
   {
     value: 100,
-    options: "small-currency",
-    description: "Get a precise a currency like a dollar amount",
-  },
-  {
-    value: 100,
     options: "short-currency",
     description:
       "Abbreviate a currency like a dollar amount that you expect to be a smallish value (<1000)",
