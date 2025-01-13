@@ -366,7 +366,6 @@ export function zuji(
     try {
       result = formatter.format(number);
     } catch (error) {
-      console.log("caught error but continuing with original number");
       result = String(number);
     }
     return result;
