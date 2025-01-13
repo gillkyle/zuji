@@ -225,10 +225,30 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
               if (value) {
                 // Cast to keyof typeof to ensure type safety
                 const shortcutKey = value as keyof typeof SHORTCUT_FORMATS;
-                setZujiOptions((prev) => ({
-                  ...prev,
+                setZujiOptions({
+                  style: undefined,
+                  unit: undefined,
+                  unitDisplay: undefined,
+                  notation: undefined,
+                  roundingMode: undefined,
+                  roundingIncrement: undefined,
+                  roundingPriority: undefined,
+                  trailingZeroDisplay: undefined,
+                  useGrouping: undefined,
+                  minimumFractionDigits: undefined,
+                  maximumFractionDigits: undefined,
+                  minimumIntegerDigits: undefined,
+                  minimumSignificantDigits: undefined,
+                  maximumSignificantDigits: undefined,
+                  signDisplay: undefined,
+                  compactDisplay: undefined,
+                  currency: undefined,
+                  currencyDisplay: undefined,
+                  currencySign: undefined,
+                  locale: undefined,
+                  safeMode: true,
                   ...SHORTCUT_FORMATS[shortcutKey],
-                }));
+                });
               }
             }}
             placeholder="Select shortcut format"

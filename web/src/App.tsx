@@ -118,6 +118,46 @@ const SHORTCUT_CASES: Array<TestCase> = [
     options: "compact-currency-usd",
     description: "US Dollar currency, with a very large number",
   },
+  {
+    value: 224,
+    options: "multiple-of-5",
+    description: "Rounds to the nearest multiple of 5",
+  },
+  {
+    value: 21,
+    options: { style: "unit", unit: "celsius" },
+    description: "Temperature in Celsius",
+  },
+  {
+    value: 70,
+    options: { style: "unit", unit: "fahrenheit" },
+    description: "Temperature in Fahrenheit",
+  },
+  {
+    value: 1024,
+    options: "bytes",
+    description: "Digital storage in bytes",
+  },
+  {
+    value: 1024,
+    options: "meters",
+    description: "Distance in meters",
+  },
+  {
+    value: 3.1,
+    options: "kilometers",
+    description: "Distance in kilometers",
+  },
+  {
+    value: 12,
+    options: "inches",
+    description: "Distance in inches",
+  },
+  {
+    value: 3.5,
+    options: "feet",
+    description: "Distance in feet",
+  },
 ] as const;
 
 const EDGE_CASES: Array<TestCase> = [
@@ -211,6 +251,11 @@ const DIGIT_EXAMPLES: Array<TestCase> = [
     value: 123.456,
     options: { minimumSignificantDigits: 4, maximumSignificantDigits: 6 },
     description: "Between 4-6 significant digits",
+  },
+  {
+    value: 5.5,
+    options: { minimumIntegerDigits: 3, minimumFractionDigits: 4 },
+    description: "Padding a number with 0's",
   },
 ];
 

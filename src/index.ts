@@ -233,6 +233,44 @@ export const SHORTCUT_FORMATS = {
     useGrouping: "always",
     roundingMode: "floor",
   },
+  "multiple-of-5": {
+    roundingIncrement: 5,
+  },
+  "degrees-celsius": {
+    style: "unit",
+    unit: "celsius",
+    unitDisplay: "short",
+  },
+  "degrees-fahrenheit": {
+    style: "unit",
+    unit: "fahrenheit",
+    unitDisplay: "short",
+  },
+  bytes: {
+    style: "unit",
+    unit: "byte",
+    unitDisplay: "short",
+  },
+  meters: {
+    style: "unit",
+    unit: "meter",
+    unitDisplay: "short",
+  },
+  kilometers: {
+    style: "unit",
+    unit: "kilometer",
+    unitDisplay: "short",
+  },
+  inches: {
+    style: "unit",
+    unit: "inch",
+    unitDisplay: "short",
+  },
+  feet: {
+    style: "unit",
+    unit: "foot",
+    unitDisplay: "short",
+  },
 } as const;
 
 export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
@@ -305,6 +343,16 @@ export function zuji(
     } else {
       formatOptions.minimumFractionDigits = formatOptions.maximumFractionDigits;
     }
+  }
+
+  // make sure the fraction digits are set if roundingIncrement is set
+  if (
+    formatOptions.roundingIncrement &&
+    (!formatOptions.minimumFractionDigits ||
+      !formatOptions.maximumFractionDigits)
+  ) {
+    formatOptions.minimumFractionDigits = 0;
+    formatOptions.maximumFractionDigits = 0;
   }
 
   // Create formatter and format the number
