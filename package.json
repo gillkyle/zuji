@@ -1,6 +1,6 @@
 {
   "name": "zuji",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Kyle Gill",
   "module": "dist/index.js",
   "description": "A lightweight number formatting utility",
@@ -15,11 +15,14 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist",
+    "build": "bun run build.ts",
     "test": "bun test",
     "prepare": "bun run build",
     "publish": "npm publish"
   },
   "type": "module",
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "bun-plugin-dts": "^0.3.0"
+  }
 }
