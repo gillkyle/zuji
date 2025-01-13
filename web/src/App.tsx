@@ -560,6 +560,15 @@ console.log(formattedNumber); // 1,000
               <ExampleTable examples={TEST_CASES} />
             </WideContainer>
             <ProseContainer>
+              <h2 id="playground">Interactive Playground</h2>
+              <p>
+                Use this playground to experiment with different formatting
+                options and see the results in real-time. Add additional test
+                cases to see how options work on different numbers.
+              </p>
+            </ProseContainer>
+            <Playground />
+            <ProseContainer>
               <h2 id="api-reference">API Reference</h2>
               <p></p>
             </ProseContainer>
@@ -1020,15 +1029,6 @@ console.log(formattedNumber); // 1,000
             <WideContainer>
               <ExampleTable examples={LOCALE_EXAMPLES} />
             </WideContainer>
-            <ProseContainer>
-              <h2 id="playground">Interactive Playground</h2>
-              <p>
-                Use this playground to experiment with different formatting
-                options and see the results in real-time. Add additional test
-                cases to see how options work on different numbers.
-              </p>
-            </ProseContainer>
-            <Playground />
             <footer className="bg-white mt-8">
               <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between">
                 <div className="flex justify-center space-x-6 md:order-2">

@@ -254,14 +254,28 @@ export function zuji(
   if (typeof number === "string") {
     const parsed = Number(number);
     if (isNaN(parsed)) {
-      throw new TypeError(`Invalid input: ${number}, expected a valid number`);
+      if (typeof options === "object" && options?.safeMode) {
+        return String(number);
+      }
+      throw new TypeError(
+        `Invalid input: ${typeof number} ${JSON.stringify(
+          number
+        )}, expected a valid number`
+      );
     }
     number = parsed;
   }
 
   // Validate number input
   if (typeof number !== "number") {
-    throw new TypeError(`Invalid input: ${number}, expected a number`);
+    if (typeof options === "object" && options?.safeMode) {
+      return String(number);
+    }
+    throw new TypeError(
+      `Invalid input: ${typeof number} ${JSON.stringify(
+        number
+      )}, expected a number`
+    );
   }
 
   // Handle shortcut formats

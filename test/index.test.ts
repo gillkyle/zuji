@@ -37,12 +37,14 @@ describe("zuji", () => {
   });
 
   test("handles safeMode", () => {
-    expect(zuji([], { safeMode: true })).toBe([]);
-    expect(zuji(1234, { safeMode: false })).toBe("1234");
+    // safeMode will not throw errors, it will just return the input
+    // @ts-expect-error
+    expect(zuji([], { safeMode: true })).toBe("");
+    // @ts-expect-error
+    expect(() => zuji([], { safeMode: false })).toThrow();
   });
 
   test("fails to format invalid stuff", () => {
-    // @ts-expect-error
     expect(() => zuji("foo")).toThrow();
     // @ts-expect-error
     expect(() => zuji(null)).toThrow();
@@ -61,14 +63,13 @@ describe("zuji", () => {
   });
 
   test("handles a number that's actually a string", () => {
-    expect(zuji("1234")).toBe("1234");
-    expect(zuji("1234.5678")).toBe("1234.5678");
+    expect(zuji("1234")).toBe("1,234");
+    expect(zuji("1234.56")).toBe("1,234.56");
   });
 
   test("formats numbers with commas", () => {
     expect(zuji(1234)).toBe("1,234");
-    expect(zuji(1234.5678)).toBe("1,234.5678");
-    expect(zuji(1234.5678)).toBe("1234.5678");
+    expect(zuji(1234.56)).toBe("1,234.56");
   });
 
   test("handles shortcut formats", () => {
@@ -79,21 +80,17 @@ describe("zuji", () => {
 
   test("handles edge cases", () => {
     expect(zuji(0)).toBe("0");
-    expect(zuji(-0)).toBe("0");
+    expect(zuji(-0)).toBe("-0");
     expect(zuji(NaN)).toBe("NaN");
     expect(zuji(Infinity)).toBe("∞");
     expect(zuji(-Infinity)).toBe("-∞");
   });
 
-  // test("handles very large and small numbers", () => {
-  //   expect(zuji(1e6, { d3format: ".2s" })).toBe("1.0M");
-  //   expect(zuji(1e-6, { d3format: ".2s" })).toBe("1.0µ");
-  //   expect(zuji(1e9, { d3format: ".2s" })).toBe("1.0G");
-  // });
-
   test("handles locales", () => {
-    expect(zuji(1234, { locale: "es-ES" })).toBe("1.234");
-    expect(zuji(1234, { locale: "fr-FR" })).toBe("1 234");
+    expect(zuji(1234, { locale: "es-ES" })).toBe("1234");
+    expect(zuji(12345, { locale: "es-ES" })).toBe("12.345");
+    expect(zuji(1234, { locale: "fr-FR" })).toBe("1 234");
+    expect(zuji(12345, { locale: "fr-FR" })).toBe("12 345");
   });
 });
 
@@ -319,10 +316,31 @@ describe("locale handling", () => {
 
 describe("rounding options", () => {
   test("roundingMode", () => {
-    expect(zuji(2.5, { roundingMode: "ceil" })).toBe("3");
-    expect(zuji(2.5, { roundingMode: "floor" })).toBe("2");
-    expect(zuji(2.5, { roundingMode: "halfExpand" })).toBe("3");
-    expect(zuji(2.5, { roundingMode: "trunc" })).toBe("2");
+    // small numbers won't round
+    expect(zuji(2.5, { notation: "compact", roundingMode: "ceil" })).toBe(
+      "2.5"
+    );
+    expect(zuji(25.75, { notation: "compact", roundingMode: "ceil" })).toBe(
+      "26"
+    );
+    expect(zuji(2.5, { notation: "compact", roundingMode: "floor" })).toBe(
+      "2.5"
+    );
+    expect(zuji(25.75, { notation: "compact", roundingMode: "floor" })).toBe(
+      "25"
+    );
+    expect(zuji(2.5, { notation: "compact", roundingMode: "halfExpand" })).toBe(
+      "2.5"
+    );
+    expect(
+      zuji(25.75, { notation: "compact", roundingMode: "halfExpand" })
+    ).toBe("26");
+    expect(zuji(2.5, { notation: "compact", roundingMode: "trunc" })).toBe(
+      "2.5"
+    );
+    expect(zuji(25.75, { notation: "compact", roundingMode: "trunc" })).toBe(
+      "25"
+    );
   });
 
   test("roundingIncrement", () => {

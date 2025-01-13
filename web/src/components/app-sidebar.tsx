@@ -33,10 +33,18 @@ const data = {
           title: "Installation",
           url: "#installation",
         },
+        {
+          title: "Shortcuts",
+          url: "#shortcuts",
+        },
+        {
+          title: "Interactive Playground",
+          url: "#playground",
+        },
       ],
     },
     {
-      title: "Options API Reference",
+      title: "API Reference",
       url: "#api-reference",
       items: [
         {
@@ -118,16 +126,6 @@ const data = {
         {
           title: "locale",
           url: "#locale-option",
-        },
-      ],
-    },
-    {
-      title: "Examples",
-      url: "#",
-      items: [
-        {
-          title: "Interactive Playground",
-          url: "#playground",
         },
       ],
     },
