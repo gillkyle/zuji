@@ -40,40 +40,84 @@ const data = {
       url: "#api-reference",
       items: [
         {
-          title: "Style Options",
-          url: "#style-options",
+          title: "style",
+          url: "#style-option",
         },
         {
-          title: "Currency Options",
-          url: "#currency-options",
+          title: "unit",
+          url: "#unit-option",
         },
         {
-          title: "Unit Options",
-          url: "#unit-options",
+          title: "unitDisplay",
+          url: "#unitDisplay-option",
         },
         {
-          title: "Digit Options",
-          url: "#digit-options",
+          title: "notation",
+          url: "#notation-option",
         },
         {
-          title: "Sign Display",
-          url: "#sign-display",
+          title: "compactDisplay",
+          url: "#compactDisplay-option",
         },
         {
-          title: "Notation Options",
-          url: "#notation-options",
+          title: "minimumIntegerDigits",
+          url: "#minimumIntegerDigits-option",
         },
         {
-          title: "Grouping Options",
-          url: "#grouping-options",
+          title: "minimumFractionDigits",
+          url: "#minimumFractionDigits-option",
         },
         {
-          title: "Rounding Options",
-          url: "#rounding-options",
+          title: "maximumFractionDigits",
+          url: "#maximumFractionDigits-option",
         },
         {
-          title: "Localization",
-          url: "#localization",
+          title: "minimumSignificantDigits",
+          url: "#minimumSignificantDigits-option",
+        },
+        {
+          title: "maximumSignificantDigits",
+          url: "#maximumSignificantDigits-option",
+        },
+        {
+          title: "signDisplay",
+          url: "#signDisplay-option",
+        },
+        {
+          title: "roundingMode",
+          url: "#roundingMode-option",
+        },
+        {
+          title: "roundingIncrement",
+          url: "#roundingIncrement-option",
+        },
+        {
+          title: "roundingPriority",
+          url: "#roundingPriority-option",
+        },
+        {
+          title: "trailingZeroDisplay",
+          url: "#trailingZeroDisplay-option",
+        },
+        {
+          title: "currency",
+          url: "#currency-option",
+        },
+        {
+          title: "currencyDisplay",
+          url: "#currencyDisplay-option",
+        },
+        {
+          title: "currencySign",
+          url: "#currencySign-option",
+        },
+        {
+          title: "useGrouping",
+          url: "#useGrouping-option",
+        },
+        {
+          title: "locale",
+          url: "#locale-option",
         },
       ],
     },

@@ -137,7 +137,7 @@ export interface ZujiOptions {
    * - "morePrecision" - Use the option that results in more precision
    * - "lessPrecision" - Use the option that results in less precision
    */
-  roundingPriority?: "auto" | "morePrecision" | "lessPrecision";
+  roundingPriority?: Intl.NumberFormatOptions["roundingPriority"];
 
   /** The increment to round to. Possible values are:
    * 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000
@@ -145,22 +145,7 @@ export interface ZujiOptions {
    *
    * Note: Cannot be mixed with significant-digits rounding or roundingPriority other than "auto"
    */
-  roundingIncrement?:
-    | 1
-    | 2
-    | 5
-    | 10
-    | 20
-    | 25
-    | 50
-    | 100
-    | 200
-    | 250
-    | 500
-    | 1000
-    | 2000
-    | 2500
-    | 5000;
+  roundingIncrement?: Intl.NumberFormatOptions["roundingIncrement"];
 
   /** How numbers should be rounded. Possible values are:
    *
@@ -174,16 +159,7 @@ export interface ZujiOptions {
    * - "halfTrunc" - Round toward zero at halfway point
    * - "halfEven" - Round toward nearest even number at halfway point
    */
-  roundingMode?:
-    | "halfExpand"
-    | "ceil"
-    | "floor"
-    | "expand"
-    | "trunc"
-    | "halfCeil"
-    | "halfFloor"
-    | "halfTrunc"
-    | "halfEven";
+  roundingMode?: Intl.NumberFormatOptions["roundingMode"];
 
   /** How trailing zeros in the fraction should be displayed. Possible values are:
    *
@@ -300,6 +276,20 @@ export function zuji(
     formatOptions = options;
   }
 
+  // make sure that maximumFractionDigits and minimumFractionDigits are both set if roundingIncrement is set
+  if (
+    formatOptions.roundingIncrement &&
+    (!formatOptions.maximumFractionDigits ||
+      !formatOptions.minimumFractionDigits)
+  ) {
+    // adjust the empty fraction digit option to match the other one
+    if (!formatOptions.maximumFractionDigits) {
+      formatOptions.maximumFractionDigits = formatOptions.minimumFractionDigits;
+    } else {
+      formatOptions.minimumFractionDigits = formatOptions.maximumFractionDigits;
+    }
+  }
+
   // Create formatter and format the number
   const formatter = new Intl.NumberFormat(
     formatOptions.locale || "en-US",
@@ -307,12 +297,14 @@ export function zuji(
   );
 
   if (formatOptions.safeMode) {
+    let result = "";
     try {
-      return formatter.format(number);
+      result = formatter.format(number);
     } catch (error) {
       console.log("caught error but continuing with original number");
-      return String(number);
+      result = String(number);
     }
+    return result;
   }
 
   return formatter.format(number);

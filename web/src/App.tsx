@@ -299,14 +299,29 @@ const UNIT_EXAMPLES: Array<TestCase> = [
     description: "Distance in kilometers (short)",
   },
   {
+    value: 3.5,
+    options: { style: "unit", unit: "liter", unitDisplay: "short" },
+    description: "Volume in liters (short)",
+  },
+  {
     value: 21,
     options: { style: "unit", unit: "celsius", unitDisplay: "narrow" },
     description: "Temperature in Celsius (narrow)",
   },
   {
+    value: 180,
+    options: { style: "unit", unit: "degree", unitDisplay: "narrow" },
+    description: "Angle in degrees (narrow)",
+  },
+  {
     value: 1024,
     options: { style: "unit", unit: "megabyte", unitDisplay: "long" },
     description: "Digital storage in megabytes (long)",
+  },
+  {
+    value: 75,
+    options: { style: "unit", unit: "kilogram", unitDisplay: "long" },
+    description: "Weight in kilograms (long)",
   },
 ];
 
@@ -491,6 +506,12 @@ export default function Page() {
                 </b>
                 .
               </p>
+              <p className="italic">Why the name?</p>
+              <p>
+                The name zuji comes from the Japanese word sūji, which means
+                "number" or "numeral", but had a 4 letter npm package name that
+                wasn't already taken :)
+              </p>
             </ProseContainer>
             <ProseContainer>
               <h2 id="installation">Installation</h2>
@@ -513,8 +534,8 @@ export default function Page() {
                   <code>
                     {`import { zuji } from "zuji";
 
-const formattedCurrency = zuji(1000);
-console.log(formattedCurrency); // 1,000
+const formattedNumber = zuji(1000);
+console.log(formattedNumber); // 1,000
 `}
                   </code>
                 </pre>
@@ -576,7 +597,96 @@ console.log(formattedCurrency); // 1,000
               <ExampleTable examples={STYLE_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
-              <h2 id="digit-options">Digit Options</h2>
+              <ApiOption
+                name="unit"
+                nativeType="string"
+                description="The unit to use for formatting. Required when style is 'unit'."
+                possibleValues={[
+                  {
+                    value: "kilometer",
+                    description: "Distance in kilometers",
+                  },
+                  {
+                    value: "celsius",
+                    description: "Temperature in Celsius",
+                  },
+                  {
+                    value: "megabyte",
+                    description: "Digital storage in megabytes",
+                  },
+                  // Add more common units as needed
+                ]}
+              />
+              <ApiOption
+                name="unitDisplay"
+                nativeType="string"
+                description="How to display the unit."
+                possibleValues={[
+                  {
+                    value: "short",
+                    description: "Short unit formatting (e.g., 16 km)",
+                    default: true,
+                  },
+                  {
+                    value: "narrow",
+                    description: "Narrow unit formatting (e.g., 16km)",
+                  },
+                  {
+                    value: "long",
+                    description: "Long unit formatting (e.g., 16 kilometers)",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={UNIT_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <ApiOption
+                name="notation"
+                nativeType="string"
+                description="Choose different notations for number display."
+                possibleValues={[
+                  {
+                    value: "standard",
+                    description: "Standard decimal notation",
+                    default: true,
+                  },
+                  {
+                    value: "scientific",
+                    description: "Scientific notation (e.g. 1.23e4)",
+                  },
+                  {
+                    value: "engineering",
+                    description: "Engineering notation (e.g. 12.3E3)",
+                  },
+                  {
+                    value: "compact",
+                    description: "Compact notation (e.g. 1K, 1M, 1B)",
+                  },
+                ]}
+              />
+              <ApiOption
+                name="compactDisplay"
+                nativeType="string"
+                description="How to display compact numbers. Only used when notation is 'compact'."
+                possibleValues={[
+                  {
+                    value: "short",
+                    description: "Short compact notation (e.g., 12K)",
+                    default: true,
+                  },
+                  {
+                    value: "long",
+                    description: "Long compact notation (e.g., 12 thousand)",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={NOTATION_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
               <ApiOption
                 name="minimumIntegerDigits"
                 nativeType="number"
@@ -668,68 +778,6 @@ console.log(formattedCurrency); // 1,000
             </ProseContainer>
             <WideContainer>
               <ExampleTable examples={SIGN_DISPLAY_EXAMPLES} />
-            </WideContainer>
-            <ProseContainer>
-              <ApiOption
-                name="notation"
-                nativeType="string"
-                description="Choose different notations for number display."
-                possibleValues={[
-                  {
-                    value: "standard",
-                    description: "Standard decimal notation",
-                    default: true,
-                  },
-                  {
-                    value: "scientific",
-                    description: "Scientific notation (e.g. 1.23e4)",
-                  },
-                  {
-                    value: "engineering",
-                    description: "Engineering notation (e.g. 12.3E3)",
-                  },
-                  {
-                    value: "compact",
-                    description: "Compact notation (e.g. 1K, 1M, 1B)",
-                  },
-                ]}
-              />
-            </ProseContainer>
-            <WideContainer>
-              <ExampleTable examples={NOTATION_EXAMPLES} />
-            </WideContainer>
-            <ProseContainer>
-              <ApiOption
-                name="locale"
-                nativeType="string"
-                description="Format numbers according to different locale conventions. Possible values are any valid ISO 4217 locale. A few examples are provided below. zuji will automatically find the best fit locale if one is not specified."
-                possibleValues={[
-                  {
-                    value: "en-US",
-                    description: "US English format",
-                    default: true,
-                  },
-                  {
-                    value: "de-DE",
-                    description: "German format",
-                  },
-                  {
-                    value: "fr-FR",
-                    description: "French format",
-                  },
-                  {
-                    value: "ja-JP",
-                    description: "Japanese format",
-                  },
-                  {
-                    value: "es-ES",
-                    description: "Spanish format",
-                  },
-                ]}
-              />
-            </ProseContainer>
-            <WideContainer>
-              <ExampleTable examples={LOCALE_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
               <ApiOption
@@ -841,7 +889,6 @@ console.log(formattedCurrency); // 1,000
               <ExampleTable examples={ROUNDING_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
-              <h2 id="currency-options">Currency Options</h2>
               <ApiOption
                 name="currency"
                 nativeType="string"
@@ -907,96 +954,6 @@ console.log(formattedCurrency); // 1,000
               <ExampleTable examples={CURRENCY_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
-              <h2 id="unit-options">Unit Options</h2>
-              <ApiOption
-                name="unit"
-                nativeType="string"
-                description="The unit to use for formatting. Required when style is 'unit'."
-                possibleValues={[
-                  {
-                    value: "kilometer",
-                    description: "Distance in kilometers",
-                  },
-                  {
-                    value: "celsius",
-                    description: "Temperature in Celsius",
-                  },
-                  {
-                    value: "megabyte",
-                    description: "Digital storage in megabytes",
-                  },
-                  // Add more common units as needed
-                ]}
-              />
-              <ApiOption
-                name="unitDisplay"
-                nativeType="string"
-                description="How to display the unit."
-                possibleValues={[
-                  {
-                    value: "short",
-                    description: "Short unit formatting (e.g., 16 km)",
-                    default: true,
-                  },
-                  {
-                    value: "narrow",
-                    description: "Narrow unit formatting (e.g., 16km)",
-                  },
-                  {
-                    value: "long",
-                    description: "Long unit formatting (e.g., 16 kilometers)",
-                  },
-                ]}
-              />
-            </ProseContainer>
-            <WideContainer>
-              <ExampleTable examples={UNIT_EXAMPLES} />
-            </WideContainer>
-            <ProseContainer>
-              <h2 id="notation-options">Notation Options</h2>
-              <ApiOption
-                name="notation"
-                nativeType="string"
-                description="The formatting notation to use for the number."
-                possibleValues={[
-                  {
-                    value: "standard",
-                    description: "Plain number formatting",
-                    default: true,
-                  },
-                  {
-                    value: "scientific",
-                    description: "Scientific notation (e.g., 1.23E4)",
-                  },
-                  {
-                    value: "engineering",
-                    description: "Engineering notation (e.g., 12.3E3)",
-                  },
-                  {
-                    value: "compact",
-                    description: "Compact notation (e.g., 12K)",
-                  },
-                ]}
-              />
-              <ApiOption
-                name="compactDisplay"
-                nativeType="string"
-                description="How to display compact numbers. Only used when notation is 'compact'."
-                possibleValues={[
-                  {
-                    value: "short",
-                    description: "Short compact notation (e.g., 12K)",
-                    default: true,
-                  },
-                  {
-                    value: "long",
-                    description: "Long compact notation (e.g., 12 thousand)",
-                  },
-                ]}
-              />
-            </ProseContainer>
-            <ProseContainer>
-              <h2 id="grouping-options">Grouping Options</h2>
               <ApiOption
                 name="useGrouping"
                 nativeType="boolean | string"
@@ -1029,6 +986,39 @@ console.log(formattedCurrency); // 1,000
             </ProseContainer>
             <WideContainer>
               <ExampleTable examples={GROUPING_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <ApiOption
+                name="locale"
+                nativeType="string"
+                description="Format numbers according to different locale conventions. Possible values are any valid ISO 4217 locale. A few examples are provided below. zuji will automatically find the best fit locale if one is not specified."
+                possibleValues={[
+                  {
+                    value: "en-US",
+                    description: "US English format",
+                    default: true,
+                  },
+                  {
+                    value: "de-DE",
+                    description: "German format",
+                  },
+                  {
+                    value: "fr-FR",
+                    description: "French format",
+                  },
+                  {
+                    value: "ja-JP",
+                    description: "Japanese format",
+                  },
+                  {
+                    value: "es-ES",
+                    description: "Spanish format",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={LOCALE_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
               <h2 id="playground">Interactive Playground</h2>

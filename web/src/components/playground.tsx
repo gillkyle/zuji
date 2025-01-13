@@ -13,7 +13,7 @@ import { SelectSeparator } from "@radix-ui/react-select";
 import { ClipboardCheckIcon, ClipboardCopyIcon, XIcon } from "lucide-react";
 import React, { useState } from "react";
 import { zuji, type ZujiOptions } from "../../../src/index";
-import { ZeroToTwenty } from "../../../src/units";
+import { OneToTwentyOne, ZeroToTwenty } from "../../../src/units";
 
 const STYLE_OPTIONS = [
   { value: "decimal", label: "Decimal" },
@@ -87,6 +87,36 @@ const COMMON_LOCALES = [
   { value: "de-DE", label: "German" },
   { value: "ja-JP", label: "Japanese" },
   { value: "zh-CN", label: "Chinese" },
+];
+
+const ROUNDING_MODE_OPTIONS = [
+  { value: "ceil", label: "Ceil" },
+  { value: "floor", label: "Floor" },
+  { value: "expand", label: "Expand" },
+  { value: "trunc", label: "Truncate" },
+  { value: "halfCeil", label: "Half Ceil" },
+  { value: "halfFloor", label: "Half Floor" },
+  { value: "halfExpand", label: "Half Expand" },
+  { value: "halfTrunc", label: "Half Truncate" },
+  { value: "halfEven", label: "Half Even" },
+];
+
+const ROUNDING_PRIORITY_OPTIONS = [
+  { value: "auto", label: "Auto" },
+  { value: "morePrecision", label: "More Precision" },
+  { value: "lessPrecision", label: "Less Precision" },
+];
+
+const TRAILING_ZERO_DISPLAY_OPTIONS = [
+  { value: "auto", label: "Auto" },
+  { value: "stripIfInteger", label: "Strip If Integer" },
+];
+
+const USE_GROUPING_OPTIONS = [
+  { value: "always", label: "Always" },
+  { value: "auto", label: "Auto" },
+  { value: "min2", label: "Min 2" },
+  { value: "false", label: "False" },
 ];
 
 interface NumberEntry {
@@ -227,7 +257,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
       </div>
 
       {/* Options Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Style Options */}
         <ClearableSelect
           value={zujiOptions.style}
@@ -269,6 +299,48 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           placeholder="Select display"
           options={UNIT_DISPLAY_OPTIONS}
           disabled={unitIsDisabled}
+        />
+
+        {/* Common options */}
+        <ClearableSelect
+          value={zujiOptions.notation}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              notation: value as ZujiOptions["notation"],
+            }))
+          }
+          apiOptionName="notation"
+          placeholder="Select notation"
+          options={NOTATION_OPTIONS}
+        />
+
+        {/* Compact Display */}
+        <ClearableSelect
+          value={zujiOptions.compactDisplay}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              compactDisplay: value as ZujiOptions["compactDisplay"],
+            }))
+          }
+          apiOptionName="compactDisplay"
+          placeholder="Select compact display"
+          options={COMPACT_DISPLAY_OPTIONS}
+          disabled={compactIsDisabled}
+        />
+
+        <ClearableSelect
+          value={zujiOptions.signDisplay}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              signDisplay: value as ZujiOptions["signDisplay"],
+            }))
+          }
+          apiOptionName="signDisplay"
+          placeholder="Select sign display"
+          options={SIGN_DISPLAY_OPTIONS}
         />
 
         {/* Currency options */}
@@ -315,66 +387,95 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           disabled={currencyIsDisabled}
         />
 
-        {/* Common options */}
         <ClearableSelect
-          value={zujiOptions.notation}
+          value={zujiOptions.roundingMode}
           onValueChange={(value) =>
             setZujiOptions((prev) => ({
               ...prev,
-              notation: value as ZujiOptions["notation"],
+              roundingMode: value as ZujiOptions["roundingMode"],
             }))
           }
-          apiOptionName="notation"
-          placeholder="Select notation"
-          options={NOTATION_OPTIONS}
-        />
-
-        {/* Compact Display */}
-        <ClearableSelect
-          value={zujiOptions.compactDisplay}
-          onValueChange={(value) =>
-            setZujiOptions((prev) => ({
-              ...prev,
-              compactDisplay: value as ZujiOptions["compactDisplay"],
-            }))
-          }
-          apiOptionName="compactDisplay"
-          placeholder="Select compact display"
-          options={COMPACT_DISPLAY_OPTIONS}
-          disabled={compactIsDisabled}
+          apiOptionName="roundingMode"
+          placeholder="Select rounding mode"
+          options={ROUNDING_MODE_OPTIONS}
         />
 
         <ClearableSelect
-          value={zujiOptions.signDisplay}
+          value={zujiOptions.roundingIncrement?.toString()}
           onValueChange={(value) =>
             setZujiOptions((prev) => ({
               ...prev,
-              signDisplay: value as ZujiOptions["signDisplay"],
+              roundingIncrement: value
+                ? (Number(value) as ZujiOptions["roundingIncrement"])
+                : undefined,
             }))
           }
-          apiOptionName="signDisplay"
-          placeholder="Select sign display"
-          options={SIGN_DISPLAY_OPTIONS}
+          apiOptionName="roundingIncrement"
+          placeholder="Select rounding increment"
+          options={[
+            { value: "1", label: "1" },
+            { value: "2", label: "2" },
+            { value: "5", label: "5" },
+            { value: "10", label: "10" },
+            { value: "20", label: "20" },
+            { value: "25", label: "25" },
+            { value: "50", label: "50" },
+            { value: "100", label: "100" },
+            { value: "200", label: "200" },
+            { value: "250", label: "250" },
+            { value: "500", label: "500" },
+            { value: "1000", label: "1000" },
+            { value: "2000", label: "2000" },
+            { value: "2500", label: "2500" },
+            { value: "5000", label: "5000" },
+          ]}
         />
 
         <ClearableSelect
-          value={zujiOptions.locale}
+          value={zujiOptions.roundingPriority}
           onValueChange={(value) =>
             setZujiOptions((prev) => ({
               ...prev,
-              locale: value as ZujiOptions["locale"],
+              roundingPriority: value as ZujiOptions["roundingPriority"],
             }))
           }
-          apiOptionName="locale"
-          placeholder="Select locale"
-          options={COMMON_LOCALES}
+          apiOptionName="roundingPriority"
+          placeholder="Select rounding priority"
+          options={ROUNDING_PRIORITY_OPTIONS}
+        />
+
+        <ClearableSelect
+          value={zujiOptions.trailingZeroDisplay}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              trailingZeroDisplay: value as ZujiOptions["trailingZeroDisplay"],
+            }))
+          }
+          apiOptionName="trailingZeroDisplay"
+          placeholder="Select trailing zero display"
+          options={TRAILING_ZERO_DISPLAY_OPTIONS}
+        />
+
+        <ClearableSelect
+          value={zujiOptions.useGrouping?.toString()}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              useGrouping:
+                value === "false"
+                  ? false
+                  : (value as ZujiOptions["useGrouping"]),
+            }))
+          }
+          apiOptionName="useGrouping"
+          placeholder="Select grouping"
+          options={USE_GROUPING_OPTIONS}
         />
 
         {/* Fraction digits */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="minimumFractionDigits">minimumFractionDigits</Label>
-          </div>
+          <LabelAndDocLink apiOptionName="minimumFractionDigits" />
           <Input
             id="minimumFractionDigits"
             type="number"
@@ -394,9 +495,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="maximumFractionDigits">maximumFractionDigits</Label>
-          </div>
+          <LabelAndDocLink apiOptionName="maximumFractionDigits" />
           <Input
             id="maximumFractionDigits"
             type="number"
@@ -414,6 +513,78 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
             }
           />
         </div>
+
+        <div className="space-y-2">
+          <LabelAndDocLink apiOptionName="minimumIntegerDigits" />
+          <Input
+            id="minimumIntegerDigits"
+            type="number"
+            min={1}
+            max={21}
+            className="h-9 my-0"
+            value={zujiOptions.minimumIntegerDigits || ""}
+            onChange={(e) =>
+              setZujiOptions((prev) => ({
+                ...prev,
+                minimumIntegerDigits: e.target.value
+                  ? (Number(e.target.value) as OneToTwentyOne)
+                  : undefined,
+              }))
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <LabelAndDocLink apiOptionName="minimumSignificantDigits" />
+          <Input
+            id="minimumSignificantDigits"
+            type="number"
+            min={1}
+            max={21}
+            className="h-9 my-0"
+            value={zujiOptions.minimumSignificantDigits || ""}
+            onChange={(e) =>
+              setZujiOptions((prev) => ({
+                ...prev,
+                minimumSignificantDigits: e.target.value
+                  ? (Number(e.target.value) as OneToTwentyOne)
+                  : undefined,
+              }))
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <LabelAndDocLink apiOptionName="maximumSignificantDigits" />
+          <Input
+            id="maximumSignificantDigits"
+            type="number"
+            min={1}
+            max={21}
+            className="h-9 my-0"
+            value={zujiOptions.maximumSignificantDigits || ""}
+            onChange={(e) =>
+              setZujiOptions((prev) => ({
+                ...prev,
+                maximumSignificantDigits: e.target.value
+                  ? (Number(e.target.value) as OneToTwentyOne)
+                  : undefined,
+              }))
+            }
+          />
+        </div>
+        <ClearableSelect
+          value={zujiOptions.locale}
+          onValueChange={(value) =>
+            setZujiOptions((prev) => ({
+              ...prev,
+              locale: value as ZujiOptions["locale"],
+            }))
+          }
+          apiOptionName="locale"
+          placeholder="Select locale"
+          options={COMMON_LOCALES}
+        />
       </div>
 
       {/* Code Snippet */}
@@ -443,6 +614,31 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
   );
 }
 
+function LabelAndDocLink({
+  apiOptionName,
+  disabled,
+}: {
+  apiOptionName: string;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Label
+        htmlFor={apiOptionName}
+        className={disabled ? "text-neutral-600" : ""}
+      >
+        {apiOptionName}
+      </Label>
+      <a
+        href={`#${apiOptionName}-option`}
+        className="text-xs text-neutral-400 hover:text-neutral-600"
+      >
+        docs
+      </a>
+    </div>
+  );
+}
+
 export function ClearableSelect({
   apiOptionName,
   value,
@@ -462,20 +658,7 @@ export function ClearableSelect({
 
   return (
     <div className="space-y-2" key={key}>
-      <div className="flex items-center gap-2">
-        <Label
-          htmlFor={apiOptionName}
-          className={disabled ? "text-neutral-600" : ""}
-        >
-          {apiOptionName}
-        </Label>
-        <a
-          href={`#${apiOptionName}-options`}
-          className="text-xs text-neutral-400 hover:text-neutral-600"
-        >
-          docs
-        </a>
-      </div>
+      <LabelAndDocLink apiOptionName={apiOptionName} disabled={disabled} />
       <div className="flex items-center gap-1">
         <Select value={value} onValueChange={onValueChange} disabled={disabled}>
           <SelectTrigger

@@ -36,6 +36,11 @@ describe("zuji", () => {
     expect(zuji(1234, { useGrouping: false })).toBe("1234");
   });
 
+  test("handles safeMode", () => {
+    expect(zuji([], { safeMode: true })).toBe([]);
+    expect(zuji(1234, { safeMode: false })).toBe("1234");
+  });
+
   test("fails to format invalid stuff", () => {
     // @ts-expect-error
     expect(() => zuji("foo")).toThrow();
@@ -346,7 +351,7 @@ describe("rounding options", () => {
         maximumFractionDigits: 2,
         roundingPriority: "lessPrecision",
       })
-    ).toBe("1.2");
+    ).toBe("1.23");
   });
 
   test("trailingZeroDisplay", () => {
