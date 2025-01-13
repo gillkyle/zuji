@@ -172,63 +172,66 @@ export interface ZujiOptions {
 /**
  * Predefined number formatting shortcuts
  */
-const SHORTCUT_FORMATS: Record<string, ZujiOptions> = {
-  "compact-currency": {
+export const SHORTCUT_FORMATS = {
+  "compact-currency-usd": {
     style: "currency",
     currency: "USD",
+    notation: "compact",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+    useGrouping: "always",
+  },
+  "standard-currency-usd": {
+    style: "currency",
+    currency: "USD",
+    notation: "standard",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-    useGrouping: true,
+    useGrouping: "always",
   },
-  "short-currency": {
+  "accounting-currency-usd": {
     style: "currency",
     currency: "USD",
-    notation: "compact",
-    compactDisplay: "short",
-    maximumFractionDigits: 1,
+    currencySign: "accounting",
+    notation: "standard",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: "always",
   },
-  "long-currency": {
-    style: "currency",
-    currency: "USD",
+  "compact-integer": {
+    style: "decimal",
     notation: "compact",
-    compactDisplay: "long",
-    maximumFractionDigits: 0,
-  },
-  "big-currency": {
-    style: "currency",
-    currency: "USD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-    useGrouping: true,
   },
-  "small-number": {
+  "standard-integer": {
     style: "decimal",
+    notation: "standard",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-    useGrouping: true,
+    useGrouping: "always",
   },
-  "short-number": {
+  "compact-decimal": {
     style: "decimal",
     notation: "compact",
-    compactDisplay: "short",
-    maximumFractionDigits: 1,
   },
-  "long-number": {
+  "standard-decimal": {
     style: "decimal",
-    notation: "compact",
-    compactDisplay: "long",
-    maximumFractionDigits: 0,
+    notation: "standard",
+    useGrouping: "always",
   },
-  "big-number": {
-    style: "decimal",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-    useGrouping: true,
-  },
-  "short-percent": {
+  "compact-percent": {
     style: "percent",
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
+    notation: "compact",
+    roundingMode: "floor",
+  },
+  "standard-percent": {
+    style: "percent",
+    notation: "standard",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+    useGrouping: "always",
+    roundingMode: "floor",
   },
 } as const;
 

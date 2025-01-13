@@ -1,6 +1,6 @@
 {
   "name": "zuji",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "Kyle Gill",
   "module": "dist/index.js",
   "description": "A lightweight number formatting utility",

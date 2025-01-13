@@ -12,7 +12,7 @@ import { useCopy } from "@/hooks/use-copy";
 import { SelectSeparator } from "@radix-ui/react-select";
 import { ClipboardCheckIcon, ClipboardCopyIcon, XIcon } from "lucide-react";
 import React, { useState } from "react";
-import { zuji, type ZujiOptions } from "../../../src/index";
+import { SHORTCUT_FORMATS, zuji, type ZujiOptions } from "../../../src/index";
 import { OneToTwentyOne, ZeroToTwenty } from "../../../src/units";
 
 const STYLE_OPTIONS = [
@@ -125,7 +125,8 @@ interface NumberEntry {
 }
 
 const POSSIBLE_NEW_NUMBERS = [
-  0.15, 10.33, 150, 1000, 53237, 120000, 250000, 1000000, 1234567890,
+  0.15, 0.675, 1.0, 10.75, -55, 150, 1000.0, -12000, 53222, 120000, 250000,
+  1000000, 1234567890,
 ];
 
 export function Playground() {
@@ -215,13 +216,32 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
     <div className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-4">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold">Playground</h3>
-        <button
-          onClick={addNumber}
-          className="px-2 bg-neutral-100 hover:bg-neutral-200 rounded-md flex items-center gap-1"
-        >
-          <span>Add Test Case</span>
-          <span className="text-lg">+</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <ClearableSelect
+            apiOptionName=""
+            value=""
+            hideLabel
+            onValueChange={(value) => {
+              if (value) {
+                // Cast to keyof typeof to ensure type safety
+                const shortcutKey = value as keyof typeof SHORTCUT_FORMATS;
+                setZujiOptions((prev) => ({
+                  ...prev,
+                  ...SHORTCUT_FORMATS[shortcutKey],
+                }));
+              }
+            }}
+            placeholder="Select shortcut format"
+            options={Object.entries(SHORTCUT_FORMATS).map(([key]) => ({
+              value: key,
+              label: key,
+            }))}
+          />
+          <Button onClick={addNumber} className="h-9" variant="outline">
+            <span>Add Test Case</span>
+            <span>+</span>
+          </Button>
+        </div>
       </div>
 
       {/* Number inputs and outputs */}
@@ -356,6 +376,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
           placeholder="Select currency"
           options={COMMON_CURRENCIES}
           disabled={currencyIsDisabled}
+          hideClearButton
         />
 
         <ClearableSelect
@@ -482,7 +503,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
             min={0}
             max={20}
             className="h-9 my-0"
-            value={zujiOptions.minimumFractionDigits || ""}
+            value={zujiOptions.minimumFractionDigits ?? ""}
             onChange={(e) =>
               setZujiOptions((prev) => ({
                 ...prev,
@@ -502,7 +523,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
             min={0}
             max={20}
             className="h-9 my-0"
-            value={zujiOptions.maximumFractionDigits || ""}
+            value={zujiOptions.maximumFractionDigits ?? ""}
             onChange={(e) =>
               setZujiOptions((prev) => ({
                 ...prev,
@@ -522,7 +543,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
             min={1}
             max={21}
             className="h-9 my-0"
-            value={zujiOptions.minimumIntegerDigits || ""}
+            value={zujiOptions.minimumIntegerDigits ?? ""}
             onChange={(e) =>
               setZujiOptions((prev) => ({
                 ...prev,
@@ -542,7 +563,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
             min={1}
             max={21}
             className="h-9 my-0"
-            value={zujiOptions.minimumSignificantDigits || ""}
+            value={zujiOptions.minimumSignificantDigits ?? ""}
             onChange={(e) =>
               setZujiOptions((prev) => ({
                 ...prev,
@@ -562,7 +583,7 @@ const formattedNumber = zuji(${firstNumber}${optionsStr});
             min={1}
             max={21}
             className="h-9 my-0"
-            value={zujiOptions.maximumSignificantDigits || ""}
+            value={zujiOptions.maximumSignificantDigits ?? ""}
             onChange={(e) =>
               setZujiOptions((prev) => ({
                 ...prev,
@@ -646,6 +667,8 @@ export function ClearableSelect({
   onValueChange,
   placeholder,
   disabled = false,
+  hideLabel = false,
+  hideClearButton = false,
 }: {
   apiOptionName: string;
   value: string | undefined;
@@ -653,12 +676,16 @@ export function ClearableSelect({
   onValueChange: (value: string | undefined) => void;
   placeholder: string;
   disabled?: boolean;
+  hideLabel?: boolean;
+  hideClearButton?: boolean;
 }) {
   const [key, setKey] = React.useState(0);
 
   return (
     <div className="space-y-2" key={key}>
-      <LabelAndDocLink apiOptionName={apiOptionName} disabled={disabled} />
+      {!hideLabel && (
+        <LabelAndDocLink apiOptionName={apiOptionName} disabled={disabled} />
+      )}
       <div className="flex items-center gap-1">
         <Select value={value} onValueChange={onValueChange} disabled={disabled}>
           <SelectTrigger
@@ -690,6 +717,7 @@ export function ClearableSelect({
               disabled={disabled}
               className={`
                 ${disabled ? "opacity-50" : ""}
+                ${hideClearButton ? "hidden" : ""}
                 h-9
               `}
             >

@@ -14,7 +14,11 @@ import { Tooltip, TooltipProvider } from "@/components/ui/tooltip";
 import { WideContainer } from "@/components/wide-container";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { ExternalLinkIcon } from "lucide-react";
-import { type ZujiOptions, type ZujiShortcut } from "../../src/index";
+import {
+  SHORTCUT_FORMATS,
+  type ZujiOptions,
+  type ZujiShortcut,
+} from "../../src/index";
 
 type TestCase = {
   value: number;
@@ -22,43 +26,101 @@ type TestCase = {
   description: string;
 };
 
-const TEST_CASES: Array<TestCase> = [
+const SHORTCUT_CASES: Array<TestCase> = [
   {
-    value: 100,
-    options: "short-currency",
+    value: 1050.25,
+    options: "standard-decimal",
+    description: "Normal decimal with grouping and no rounding",
+  },
+  {
+    value: 1050.25,
+    options: "standard-integer",
+    description: "Number with grouping rounded to an integer value",
+  },
+  {
+    value: 1050.75,
+    options: "standard-integer",
+    description: "Number with grouping rounded to an integer value",
+  },
+  {
+    value: 1050.25,
+    options: "compact-decimal",
+    description: "Abbreviated number a shortened label",
+  },
+  {
+    value: 1050.25,
+    options: "compact-integer",
+    description: "Abbreviated number that will round to an integer",
+  },
+  {
+    value: 0.105025,
+    options: "standard-percent",
+    description: "Percentage with grouping and decimals",
+  },
+  {
+    value: 0.105075,
+    options: "standard-percent",
+    description: "Percentage with grouping and decimals",
+  },
+  {
+    value: 0.99999,
+    options: "standard-percent",
     description:
-      "Abbreviate a currency like a dollar amount that you expect to be a smallish value (<1000)",
+      "Percentage with grouping and decimals (won't round up to 100%)",
   },
   {
-    value: 100_000_000,
-    options: "long-currency",
-    description: "Display a precise currency like a dollar amount",
+    value: 1,
+    options: "standard-percent",
+    description: "Percentage with grouping and decimals",
   },
   {
-    value: 100_000_000,
-    options: "big-currency",
-    description: "Abbreviate a currency like a dollar amount",
+    value: 0.105025,
+    options: "compact-percent",
+    description: "Percentage without decimals",
   },
   {
-    value: 1000,
-    options: "small-number",
-    description: "Shorten a number like a count",
+    value: 0.999,
+    options: "compact-percent",
+    description: "Percentage without decimals (won't round up to 100%)",
   },
   {
-    value: 1000,
-    options: "short-number",
-    description: "Shorten a number like a count",
+    value: 1,
+    options: "compact-percent",
+    description: "Percentage without decimals",
   },
   {
-    value: 0.53,
-    options: "short-percent",
-    description: "Shorten a percentage like a decimal",
+    value: 150,
+    options: "standard-currency-usd",
+    description: "US Dollar currency",
   },
   {
-    value: 1000,
-    options: "long-number",
-    description: "Lengthen a number like a count",
+    value: 152_100_000,
+    options: "standard-currency-usd",
+    description: "US Dollar currency, with a very large number",
   },
+  {
+    value: -150,
+    options: "accounting-currency-usd",
+    description: "US Dollar currency, with accounting notation",
+  },
+  {
+    value: 149.99,
+    options: "compact-currency-usd",
+    description: "US Dollar currency",
+  },
+  {
+    value: 150,
+    options: "compact-currency-usd",
+    description: "US Dollar currency, with trailing zeros trimmed",
+  },
+  {
+    value: 152_100_000,
+    options: "compact-currency-usd",
+    description: "US Dollar currency, with a very large number",
+  },
+] as const;
+
+const EDGE_CASES: Array<TestCase> = [
   {
     value: Infinity,
     options: null,
@@ -268,8 +330,19 @@ const ROUNDING_EXAMPLES: Array<TestCase> = [
       "Use more precise rounding between significant and fraction digits",
   },
   {
-    value: 100.0,
-    options: { trailingZeroDisplay: "stripIfInteger" },
+    value: 100.05,
+    options: {
+      minimumFractionDigits: 2,
+      trailingZeroDisplay: "stripIfInteger",
+    },
+    description: "Strip trailing zeros for integers",
+  },
+  {
+    value: "100.0" as any,
+    options: {
+      minimumFractionDigits: 2,
+      trailingZeroDisplay: "stripIfInteger",
+    },
     description: "Strip trailing zeros for integers",
   },
 ];
@@ -397,8 +470,22 @@ export default function Page() {
                   <strong>value</strong> - The number to format.
                 </li>
                 <li>
-                  <strong>options</strong> - The <b>strongly typed</b> options
-                  to use for formatting.
+                  <strong>options</strong> - The options to use for formatting,
+                  either a pre-configured string shortcut{" "}
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <code>ZujiShortcut</code>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="bottom"
+                      className="bg-neutral-900 text-sky-100 px-2 text-sm font-mono py-1"
+                    >
+                      {Object.keys(SHORTCUT_FORMATS).map((key) => (
+                        <div key={key}>'{key}'</div>
+                      ))}
+                    </TooltipContent>
+                  </Tooltip>
+                  or a typed <code>ZujiOptions</code> object.
                 </li>
               </ol>
             </ProseContainer>
@@ -453,31 +540,33 @@ export default function Page() {
               <h2>Overview</h2>
               <p>
                 zuji is a developer friendly API for formatting numbers. It is:
-                <ul>
-                  <li>
-                    <b>straightforward to pick up</b>, the entire API surface is
-                    a single function + a few exported types if you need them,
-                    and makes formatting numbers easy
-                  </li>
-                  <li>
-                    <b>standards based</b>, the API extends the{" "}
-                    <code>Intl.NumberFormat</code> API, which makes the API you
-                    pick up consistent with what is built-in to JavaScript
-                    runtimes
-                  </li>
-                  <li>
-                    <b>comprehensive</b>, the API covers virtually every option
-                    you need to format numbers, and supports every ISO standard
-                    locale out of the box
-                  </li>
-                  <li>
-                    <b>tiny</b>, with <span>zero dependencies</span> and a
-                    single purpose
-                  </li>
-                  <li>
-                    and <b>flexible</b> when you need to configure it further
-                  </li>
-                </ul>
+              </p>
+              <ul>
+                <li>
+                  <b>straightforward to pick up</b>, the entire API surface is a
+                  single function + a few exported types if you need them, and
+                  makes formatting numbers easy
+                </li>
+                <li>
+                  <b>standards based</b>, the API extends the{" "}
+                  <code>Intl.NumberFormat</code> API, which makes the API you
+                  pick up consistent with what is built-in to JavaScript
+                  runtimes
+                </li>
+                <li>
+                  <b>comprehensive</b>, the API covers virtually every option
+                  you need to format numbers, and supports every ISO standard
+                  locale out of the box
+                </li>
+                <li>
+                  <b>tiny</b>, with <span>zero dependencies</span> and a single
+                  purpose
+                </li>
+                <li>
+                  and <b>flexible</b> when you need to configure it further
+                </li>
+              </ul>
+              <p>
                 The design leans into the principle of progressive disclosure.
                 You can start using preconfigured{" "}
                 <a href="#shortcuts">shortcuts</a> that are friendly and easy to
@@ -515,7 +604,7 @@ export default function Page() {
             </ProseContainer>
             <ProseContainer>
               <h2 id="installation">Installation</h2>
-              <p>
+              <div>
                 To use in your own project, install the package:
                 <pre>
                   <code>npm install zuji</code>
@@ -539,6 +628,24 @@ console.log(formattedNumber); // 1,000
 `}
                   </code>
                 </pre>
+              </div>
+            </ProseContainer>
+            <ProseContainer>
+              <h2 id="typescript">TypeScript</h2>
+              <p>
+                zuji is written in TypeScript, and helper types are exported
+                from the package for use extending in your own appliation. This
+                includes <code>ZujiShortcut</code> and <code>ZujiOptions</code>.
+              </p>
+              <p>
+                Intellisense and autocomplete with descriptive examples will
+                show up in your editor for any option you can provide.
+              </p>
+              <p>
+                zuji also narrows types built into the{" "}
+                <code>Intl.NumberFormat</code> API, providing stricter types for
+                options like <code>locale</code> and <code>unit</code>, to
+                protect you from passing invalid options.
               </p>
             </ProseContainer>
             <ProseContainer>
@@ -557,7 +664,29 @@ console.log(formattedNumber); // 1,000
               </p>
             </ProseContainer>
             <WideContainer>
-              <ExampleTable examples={TEST_CASES} />
+              <ExampleTable examples={SHORTCUT_CASES} />
+            </WideContainer>
+            <ProseContainer>
+              <div>
+                When the shortcuts don't cover your use case, you can replace
+                the shortcut string with a typed <code>ZujiOptions</code>{" "}
+                object.
+              </div>
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable
+                examples={[
+                  {
+                    value: 1050,
+                    options: {
+                      style: "currency",
+                      currency: "USD",
+                      trailingZeroDisplay: "stripIfInteger",
+                    },
+                    description: "Currency formatting",
+                  },
+                ]}
+              />
             </WideContainer>
             <ProseContainer>
               <h2 id="playground">Interactive Playground</h2>
@@ -878,7 +1007,7 @@ console.log(formattedNumber); // 1,000
               <ApiOption
                 name="trailingZeroDisplay"
                 nativeType="string"
-                description="Control how trailing zeros in the fraction should be displayed."
+                description="Control how trailing zeros in the fraction should be displayed. The stripIfInteger option is useful when minimum digits are set to something like 2 or more and the result of your formatting could be an integer value that would show trailing zeros like 100.00."
                 possibleValues={[
                   {
                     value: "auto",
@@ -1028,6 +1157,16 @@ console.log(formattedNumber); // 1,000
             </ProseContainer>
             <WideContainer>
               <ExampleTable examples={LOCALE_EXAMPLES} />
+            </WideContainer>
+            <ProseContainer>
+              <h2>Edge Cases</h2>
+              <p>
+                Finally, zuji handles a few edge cases on your behalf. These are
+                a few:
+              </p>
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={EDGE_CASES} />
             </WideContainer>
             <footer className="bg-white mt-8">
               <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between">

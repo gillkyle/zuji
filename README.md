@@ -14,13 +14,13 @@ npm install zuji
 import { zuji } from "zuji";
 
 // Format currency
-zuji(1234.56, "short-currency"); // "$1,234.56"
+zuji(1234.56, "compact-currency-usd"); // "$1,234.56"
 
 // Format number
-zuji(1234, "short-number"); // "1,234"
+zuji(1234, "standard-integer"); // "1,234"
 
 // Format percentage
-zuji(0.1234, "short-percent"); // "12.3%"
+zuji(0.1234, "compact-percent"); // "12.3%"
 ```
 
 ## Name

@@ -73,9 +73,9 @@ describe("zuji", () => {
   });
 
   test("handles shortcut formats", () => {
-    expect(zuji(1234, "short-currency")).toBe("$1,234.00");
-    expect(zuji(1234, "short-number")).toBe("1,234");
-    expect(zuji(0.1234, "short-percent")).toBe("12.3%");
+    expect(zuji(1234, "standard-currency-usd")).toBe("$1,234.00");
+    expect(zuji(1234, "standard-integer")).toBe("1,234");
+    expect(zuji(0.1234, "standard-percent")).toBe("12.3%");
   });
 
   test("handles edge cases", () => {

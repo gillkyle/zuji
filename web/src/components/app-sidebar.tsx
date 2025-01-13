@@ -34,6 +34,10 @@ const data = {
           url: "#installation",
         },
         {
+          title: "TypeScript",
+          url: "#typescript",
+        },
+        {
           title: "Shortcuts",
           url: "#shortcuts",
         },
@@ -128,6 +132,14 @@ const data = {
           url: "#locale-option",
         },
       ],
+    },
+    {
+      title: "GitHub",
+      url: "https://github.com/gillkyle/zuji",
+    },
+    {
+      title: "Twitter/X",
+      url: "https://x.com/gillkyle",
     },
   ],
 };
