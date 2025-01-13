@@ -30,21 +30,24 @@ bun add zuji
 ```js
 import { zuji } from "zuji";
 
-// Format currency
-zuji(1234.56, "compact-currency-usd"); // "$1.2K"
+// use shortcuts
+// -> currency
+zuji(1234.56, "compact-currency-usd"); // "$1.23K"
 
-// Format number
+// -> integer
 zuji(1234, "standard-integer"); // "1,234"
 
-// Format percentage
+// -> percentage
 zuji(0.1234, "compact-percent"); // "12%"
 
-// Custom formatting
-zuji(1050, {
+// or fallback to an even narrower typed Intl.NumberFormatOptions
+// -> currency without trailing zeros, in accounting notation
+zuji(-1050, {
   style: "currency",
   currency: "USD",
+  currencySign: "accounting",
   trailingZeroDisplay: "stripIfInteger",
-}); // "$1,050"
+}); // "($1,050)"
 ```
 
 ## Why zuji?
@@ -91,7 +94,7 @@ The `ZujiOptions` object supports all `Intl.NumberFormat` options including:
 - `roundingMode` - halfExpand, ceil, floor, etc.
 - And many more...
 
-See the [full documentation](https://zuji.vercel.app) for complete examples and API reference.
+See the [full documentation](https://zuji-ts.vercel.app) for complete examples and API reference.
 
 ## TypeScript
 
@@ -101,6 +104,10 @@ zuji is written in TypeScript and exports helper types including `ZujiShortcut` 
 
 The name zuji comes from the Japanese word sūji (数字), which means "number" or "numeral".
 
+## Playground
+
+See the [interactive playground](https://zuji-ts.vercel.app/#playground) to explore the API and test out formatting options.
+
 ## License
 
-MIT © [Your Name]
+MIT © [Kyle Gill](https://github.com/gillkyle)
