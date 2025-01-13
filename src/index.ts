@@ -1,4 +1,17 @@
 import { ISO417CurrencyCode } from "./currency";
+import {
+  NumberFormatOptionsCompactDisplay,
+  NumberFormatOptionsCurrencyDisplay,
+  NumberFormatOptionsCurrencySign,
+  NumberFormatOptionsNotation,
+  NumberFormatOptionsRoundingModeType,
+  NumberFormatOptionsRoundingPriority,
+  NumberFormatOptionsSignDisplay,
+  NumberFormatOptionsStyle,
+  NumberFormatOptionsTrailingZeroDisplay,
+  NumberFormatOptionsUnitDisplay,
+  NumberFormatOptionsUseGrouping,
+} from "./intl-numberformat";
 import { SupportedBCP47Locale } from "./locales";
 import { OneToTwentyOne, SanctionedCLDRUnit, ZeroToTwenty } from "./units";
 
@@ -21,7 +34,7 @@ export interface ZujiOptions {
    * - "percent" - Percentage formatting
    * - "unit" - Unit formatting (requires unit property)
    */
-  style?: Intl.NumberFormatOptions["style"];
+  style?: NumberFormatOptionsStyle;
 
   /** The currency to use in currency formatting. Required when style is "currency".
    * Uses ISO 4217 currency codes (e.g., "USD", "EUR", "JPY")
@@ -35,14 +48,14 @@ export interface ZujiOptions {
    * - "code" - Use currency code (e.g., "USD")
    * - "name" - Use currency name (e.g., "US Dollar")
    */
-  currencyDisplay?: Intl.NumberFormatOptions["currencyDisplay"];
+  currencyDisplay?: NumberFormatOptionsCurrencyDisplay;
 
   /** How to handle negative currency values. Possible values are:
    *
    * - "standard" (default) - Use minus sign (e.g., -$1.00)
    * - "accounting" - Use accounting notation (e.g., ($1.00))
    */
-  currencySign?: "standard" | "accounting";
+  currencySign?: NumberFormatOptionsCurrencySign;
 
   /** The unit to use in unit formatting. Required when style is "unit".
    * Uses sanctioned unit identifiers (e.g., "kilometer-per-hour", "percent", "liter")
@@ -55,7 +68,7 @@ export interface ZujiOptions {
    * - "narrow" - Narrow unit formatting (e.g., "16l")
    * - "long" - Long unit formatting (e.g., "16 liters")
    */
-  unitDisplay?: Intl.NumberFormatOptions["unitDisplay"];
+  unitDisplay?: NumberFormatOptionsUnitDisplay;
 
   // ------------ Digit options ------------
   /** The minimum number of integer digits to use.
@@ -99,14 +112,14 @@ export interface ZujiOptions {
    * - "engineering" - Engineering notation (e.g., 12.3E3)
    * - "compact" - Compact notation (e.g., "12K")
    */
-  notation?: Intl.NumberFormatOptions["notation"];
+  notation?: NumberFormatOptionsNotation;
 
   /** Only used when notation is "compact". Possible values are:
    *
    * - "short" (default) - Short compact notation (e.g., "12K")
    * - "long" - Long compact notation (e.g., "12 thousand")
    */
-  compactDisplay?: Intl.NumberFormatOptions["compactDisplay"];
+  compactDisplay?: NumberFormatOptionsCompactDisplay;
 
   /** Whether to use grouping separators, such as thousands separators or thousand/lakh/crore separators.
 
@@ -118,7 +131,7 @@ export interface ZujiOptions {
    * - true - Same as "always"
    * - false - Never use grouping separators
    */
-  useGrouping?: Intl.NumberFormatOptions["useGrouping"];
+  useGrouping?: NumberFormatOptionsUseGrouping;
 
   /** When to display the sign. Possible values are:
    *
@@ -128,7 +141,7 @@ export interface ZujiOptions {
    * - "negative" - Show sign for negative numbers only
    * - "never" - Never show sign
    */
-  signDisplay?: Intl.NumberFormatOptions["signDisplay"];
+  signDisplay?: NumberFormatOptionsSignDisplay;
 
   // ------------ Rounding options ------------
   /** How to resolve conflicts between significant digits and fraction digits rounding. Possible values are:
@@ -137,7 +150,7 @@ export interface ZujiOptions {
    * - "morePrecision" - Use the option that results in more precision
    * - "lessPrecision" - Use the option that results in less precision
    */
-  roundingPriority?: Intl.NumberFormatOptions["roundingPriority"];
+  roundingPriority?: NumberFormatOptionsRoundingPriority;
 
   /** The increment to round to. Possible values are:
    * 1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000
@@ -145,7 +158,22 @@ export interface ZujiOptions {
    *
    * Note: Cannot be mixed with significant-digits rounding or roundingPriority other than "auto"
    */
-  roundingIncrement?: Intl.NumberFormatOptions["roundingIncrement"];
+  roundingIncrement?:
+    | 1
+    | 2
+    | 5
+    | 10
+    | 20
+    | 25
+    | 50
+    | 100
+    | 200
+    | 250
+    | 500
+    | 1000
+    | 2000
+    | 2500
+    | 5000;
 
   /** How numbers should be rounded. Possible values are:
    *
@@ -159,14 +187,14 @@ export interface ZujiOptions {
    * - "halfTrunc" - Round toward zero at halfway point
    * - "halfEven" - Round toward nearest even number at halfway point
    */
-  roundingMode?: Intl.NumberFormatOptions["roundingMode"];
+  roundingMode?: NumberFormatOptionsRoundingModeType;
 
   /** How trailing zeros in the fraction should be displayed. Possible values are:
    *
    * - "auto" (default) - Show trailing zeros according to minimumFractionDigits and minimumSignificantDigits
    * - "stripIfInteger" - Remove trailing zeros if the number is an integer
    */
-  trailingZeroDisplay?: "auto" | "stripIfInteger";
+  trailingZeroDisplay?: NumberFormatOptionsTrailingZeroDisplay;
 }
 
 /**
@@ -278,7 +306,7 @@ export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
 /**
  * Formats a number using Intl.NumberFormat with the specified options
  * @param number - The number to format
- * @param options - a shortcut string or Int.NumberFormatting options
+ * @param options - a shortcut string or Intl.NumberFormatOptions
  *
  * @returns The formatted number string
  */

@@ -157,7 +157,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-mono font-semibold">zuji</span>
-                  <span className="text-xs text-muted-foreground">v1.0.2</span>
+                  <span className="text-xs text-muted-foreground">v1.0.3</span>
                 </div>
               </a>
             </SidebarMenuButton>

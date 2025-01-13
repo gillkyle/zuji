@@ -1204,6 +1204,30 @@ console.log(formattedNumber); // 1,000
               <ExampleTable examples={LOCALE_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
+              {/* doc safeMode */}
+              <ApiOption
+                name="safeMode"
+                nativeType="boolean"
+                description="Zuji specific. Whether or not to throw an error if there is an issue while parsing"
+                possibleValues={[
+                  {
+                    value: "false",
+                    description:
+                      "Do not throw an error if there is an issue while parsing, return the original value instead",
+                    default: true,
+                  },
+                  {
+                    value: "true",
+                    description:
+                      "Throw an error if there is an issue while parsing",
+                  },
+                ]}
+              />
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable examples={EDGE_CASES} />
+            </WideContainer>
+            <ProseContainer>
               <h2>Edge Cases</h2>
               <p>
                 Finally, zuji handles a few edge cases on your behalf. These are
