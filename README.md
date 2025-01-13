@@ -1,11 +1,28 @@
-# Zuji
+<div align="center">
+  <h1>千 zuji</h1>
+  <p><strong>TypeScript first, human-readable numeric formatting</strong></p>
+</div>
 
-A lightweight number formatting utility built on top of `Intl.NumberFormat`.
+---
+
+zuji is a developer friendly API for formatting numbers. It is:
+
+- **straightforward to pick up** - the entire API surface is a single function + a few exported types if you need them
+- **standards based** - extends the `Intl.NumberFormat` API, making it consistent with JavaScript runtimes
+- **comprehensive** - covers virtually every option you need to format numbers, supporting every ISO standard locale
+- **tiny** - zero dependencies and single purpose
+- **flexible** - when you need to configure it further
 
 ## Installation
 
 ```bash
 npm install zuji
+# or
+pnpm add zuji
+# or
+yarn add zuji
+# or
+bun add zuji
 ```
 
 ## Usage
@@ -14,19 +31,76 @@ npm install zuji
 import { zuji } from "zuji";
 
 // Format currency
-zuji(1234.56, "compact-currency-usd"); // "$1,234.56"
+zuji(1234.56, "compact-currency-usd"); // "$1.2K"
 
 // Format number
 zuji(1234, "standard-integer"); // "1,234"
 
 // Format percentage
-zuji(0.1234, "compact-percent"); // "12.3%"
+zuji(0.1234, "compact-percent"); // "12%"
+
+// Custom formatting
+zuji(1050, {
+  style: "currency",
+  currency: "USD",
+  trailingZeroDisplay: "stripIfInteger",
+}); // "$1,050"
 ```
 
-## Name
+## Why zuji?
 
-sūji is the Japanese word for numeral. zuji is a phonetically modified version of the Japanese word, that happened to be:
+Number formatting is simple on the surface but becomes increasingly complex when you introduce:
 
-1. short
-2. easy to type
-3. an unclaimed npm package name
+- Different grouping separators (1,000 in US vs 1.000 in Spain)
+- Currencies ($ vs ¥)
+- Notations (1,000,000 vs 1M vs 1e6)
+- Rounding (0.99 -> 100% vs 0.99 -> 99%)
+- And more...
+
+zuji gives you a method to cover these problems out of the box. **You won't have to learn a new formatting grammar or pour through MDN docs to get it right**.
+
+## Built-in Shortcuts
+
+The easiest way to format numbers is using pre-configured shortcuts:
+
+- `standard-decimal` - Normal decimal with grouping and no rounding
+- `standard-integer` - Number with grouping rounded to integer
+- `compact-decimal` - Abbreviated number with shortened label
+- `compact-integer` - Abbreviated number rounded to integer
+- `standard-percent` - Percentage with grouping and decimals
+- `compact-percent` - Percentage without decimals
+- `standard-currency-usd` - US Dollar currency
+- `compact-currency-usd` - Abbreviated US Dollar currency
+- `accounting-currency-usd` - US Dollar with accounting notation
+- And more...
+
+## API Reference
+
+zuji takes two arguments:
+
+1. **value** - The number to format
+2. **options** - Either a pre-configured string shortcut or a typed `ZujiOptions` object
+
+The `ZujiOptions` object supports all `Intl.NumberFormat` options including:
+
+- `style` - decimal, currency, percent, unit
+- `notation` - standard, scientific, engineering, compact
+- `unit` - kilometer, celsius, megabyte, etc.
+- `currency` - USD, EUR, JPY, etc.
+- `signDisplay` - auto, always, never, exceptZero
+- `roundingMode` - halfExpand, ceil, floor, etc.
+- And many more...
+
+See the [full documentation](https://zuji.vercel.app) for complete examples and API reference.
+
+## TypeScript
+
+zuji is written in TypeScript and exports helper types including `ZujiShortcut` and `ZujiOptions`. Intellisense and autocomplete with descriptive examples will show up in your editor for any option you provide.
+
+## Why the name?
+
+The name zuji comes from the Japanese word sūji (数字), which means "number" or "numeral".
+
+## License
+
+MIT © [Your Name]
