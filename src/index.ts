@@ -301,6 +301,12 @@ export const SHORTCUT_FORMATS = {
   },
 } as const;
 
+/**
+ * NumeralString is either all digits (e.g. "1234")
+ * or digits dot digits (e.g. "1234.5678").
+ */
+export type NumeralString = `${bigint}` | `${bigint}.${bigint}`;
+
 export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
 
 /**
@@ -312,7 +318,7 @@ export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
  * @returns The formatted number string
  */
 export function zuji(
-  number: number | string,
+  number: number | NumeralString,
   options: ZujiOptions | ZujiShortcut | null | undefined = {},
   overrideOptions: ZujiOptions = {}
 ): string {

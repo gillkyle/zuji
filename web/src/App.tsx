@@ -477,7 +477,7 @@ export default function Page() {
                   千 zuji
                 </div>
               </div>
-              <a href="https://github.com/zuji-js/zuji">
+              <a href="https://github.com/gillkyle/zuji">
                 <Button variant="secondary">
                   <svg
                     height="32"
@@ -605,8 +605,15 @@ export default function Page() {
                   locale out of the box
                 </li>
                 <li>
-                  <b>tiny</b>, with <span>zero dependencies</span> and a single
-                  purpose
+                  <b>tiny</b>,{" "}
+                  <a
+                    href="https://bundlephobia.com/package/zuji@latest"
+                    target="_blank"
+                    className="text-sky-600"
+                  >
+                    ~900 bytes minified and gzipped
+                  </a>{" "}
+                  with <span>zero dependencies</span> and a single purpose
                 </li>
                 <li>
                   and <b>flexible</b> when you need to configure it further

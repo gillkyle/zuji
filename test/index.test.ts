@@ -45,6 +45,7 @@ describe("zuji", () => {
   });
 
   test("fails to format invalid stuff", () => {
+    // @ts-expect-error
     expect(() => zuji("foo")).toThrow();
     // @ts-expect-error
     expect(() => zuji(null)).toThrow();
