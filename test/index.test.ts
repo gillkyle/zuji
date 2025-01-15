@@ -75,7 +75,7 @@ describe("zuji", () => {
   test("handles shortcut formats", () => {
     expect(zuji(1234, "standard-currency-usd")).toBe("$1,234.00");
     expect(zuji(1234, "standard-integer")).toBe("1,234");
-    expect(zuji(0.1234, "standard-percent")).toBe("12.3%");
+    expect(zuji(0.1234, "standard-percent")).toBe("12.34%");
   });
 
   test("handles edge cases", () => {
@@ -380,5 +380,25 @@ describe("rounding options", () => {
     expect(
       zuji(100.0, { trailingZeroDisplay: "auto", minimumFractionDigits: 2 })
     ).toBe("100.00");
+  });
+
+  describe("overrideOptions", () => {
+    test("can override options", () => {
+      expect(
+        zuji(100, "standard-currency-usd", { minimumFractionDigits: 3 })
+      ).toBe("$100.000");
+      expect(zuji(0.5, "compact-percent", { minimumFractionDigits: 3 })).toBe(
+        "50.000%"
+      );
+      expect(zuji(0.57, "compact-percent", { roundingIncrement: 10 })).toBe(
+        "50%"
+      );
+      expect(
+        zuji(0.57, "compact-percent", {
+          roundingMode: "ceil",
+          roundingIncrement: 10,
+        })
+      ).toBe("60%");
+    });
   });
 });

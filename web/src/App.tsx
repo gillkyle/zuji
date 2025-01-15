@@ -1,5 +1,6 @@
 import { ApiOption } from "@/components/api-option";
 import { AppSidebar } from "@/components/app-sidebar";
+import { Copyable } from "@/components/copyable";
 import { ExampleTable } from "@/components/example-table";
 import { Playground } from "@/components/playground";
 import { ProseContainer } from "@/components/prose-container";
@@ -652,16 +653,24 @@ export default function Page() {
               <div>
                 To use in your own project, install the package:
                 <pre>
-                  <code>npm install zuji</code>
+                  <Copyable text="npm install zuji">
+                    <code>npm install zuji</code>
+                  </Copyable>
                 </pre>
                 <pre>
-                  <code>pnpm add zuji</code>
+                  <Copyable text="pnpm add zuji">
+                    <code>pnpm add zuji</code>
+                  </Copyable>
                 </pre>
                 <pre>
-                  <code>bun add zuji</code>
+                  <Copyable text="bun add zuji">
+                    <code>bun add zuji</code>
+                  </Copyable>
                 </pre>
                 <pre>
-                  <code>yarn add zuji</code>
+                  <Copyable text="yarn add zuji">
+                    <code>yarn add zuji</code>
+                  </Copyable>
                 </pre>
                 Then you can import the function and call it anywhere.
                 <pre>
@@ -713,8 +722,50 @@ console.log(formattedNumber); // 1,000
             </WideContainer>
             <ProseContainer>
               <div>
-                When the shortcuts don't cover your use case, you can replace
-                the shortcut string with a typed <code>ZujiOptions</code>{" "}
+                When the shortcuts don't <em>quite</em> cover your use case, you
+                can add a 3rd optional argument which is a typed{" "}
+                <code>ZujiOptions</code> object.
+              </div>
+            </ProseContainer>
+            <WideContainer>
+              <ExampleTable
+                optionsRenderer={(ex) => {
+                  const stringifiedOpts = JSON.stringify(
+                    ex.overrideOptions,
+                    null,
+                    2
+                  );
+                  return `"${ex.options}"${stringifiedOpts ? `, ${stringifiedOpts}` : ""}`;
+                }}
+                examples={[
+                  {
+                    value: 1050,
+                    options: "standard-currency-usd",
+                    description: "Base format",
+                  },
+                  {
+                    value: 1050,
+                    options: "standard-currency-usd",
+                    overrideOptions: {
+                      useGrouping: false,
+                    },
+                    description: 'No ","',
+                  },
+                  {
+                    value: 1050,
+                    options: "standard-currency-usd",
+                    overrideOptions: {
+                      trailingZeroDisplay: "stripIfInteger",
+                    },
+                    description: "Strip 0's",
+                  },
+                ]}
+              />
+            </WideContainer>
+            <ProseContainer>
+              <div>
+                If extra arity isn't your style, you could also instead replace
+                the shortcut string with a fully-loaded <code>ZujiOptions</code>{" "}
                 object.
               </div>
             </ProseContainer>
@@ -723,12 +774,31 @@ console.log(formattedNumber); // 1,000
                 examples={[
                   {
                     value: 1050,
+                    options: "standard-currency-usd",
+                    description: "Base format",
+                  },
+                  {
+                    value: 1050,
                     options: {
                       style: "currency",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                       currency: "USD",
+                      useGrouping: false,
+                    },
+                    description: 'No ","',
+                  },
+                  {
+                    value: 1050,
+                    options: {
+                      style: "currency",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                      currency: "USD",
+                      useGrouping: "always",
                       trailingZeroDisplay: "stripIfInteger",
                     },
-                    description: "Currency formatting",
+                    description: "Strip 0's",
                   },
                 ]}
               />

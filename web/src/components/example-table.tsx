@@ -5,13 +5,15 @@ interface Example {
   value: number;
   options: ZujiOptions | ZujiShortcut | null;
   description: string;
+  overrideOptions?: ZujiOptions;
 }
 
 interface ExampleTableProps {
   examples: Example[];
+  optionsRenderer?: (example: Example) => string;
 }
 
-export function ExampleTable({ examples }: ExampleTableProps) {
+export function ExampleTable({ examples, optionsRenderer }: ExampleTableProps) {
   return (
     <div className="relative overflow-aut">
       <div className="overflow-hidden">
@@ -70,7 +72,9 @@ export function ExampleTable({ examples }: ExampleTableProps) {
                         </span>
                         ,{" "}
                         <span className="text-sky-600 font-medium">
-                          {JSON.stringify(example.options, null, 2)}
+                          {optionsRenderer
+                            ? optionsRenderer(example)
+                            : JSON.stringify(example.options, null, 2)}
                         </span>
                         )
                       </code>
@@ -78,7 +82,11 @@ export function ExampleTable({ examples }: ExampleTableProps) {
                   </Copyable>
                 </td>
                 <td className="border-t border-b border-neutral-200 border-dashed p-3 font-semibold text-neutral-700 dark:text-neutral-400">
-                  {zuji(example.value, example.options)}
+                  {zuji(
+                    example.value,
+                    example.options,
+                    example.overrideOptions
+                  )}
                 </td>
               </tr>
             ))}

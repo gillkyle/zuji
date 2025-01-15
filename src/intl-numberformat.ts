@@ -35,7 +35,8 @@ export type NumberFormatOptionsUseGrouping =
   | "min2"
   | "auto"
   | "always"
-  | boolean;
+  | false
+  | true;
 
 export type NumberFormatOptionsRoundingPriority =
   | "auto"

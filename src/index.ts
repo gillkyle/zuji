@@ -306,13 +306,15 @@ export type ZujiShortcut = keyof typeof SHORTCUT_FORMATS;
 /**
  * Formats a number using Intl.NumberFormat with the specified options
  * @param number - The number to format
- * @param options - a shortcut string or Intl.NumberFormatOptions
+ * @param options - a shortcut string or options object
+ * @param overrideOptions - (optional) options to override the individual settings when used with a shortcut string, this is for convenience
  *
  * @returns The formatted number string
  */
 export function zuji(
   number: number | string,
-  options: ZujiOptions | ZujiShortcut | null | undefined = {}
+  options: ZujiOptions | ZujiShortcut | null | undefined = {},
+  overrideOptions: ZujiOptions = {}
 ): string {
   // Handle special cases
   if (number === Infinity) return "∞";
@@ -347,11 +349,23 @@ export function zuji(
     );
   }
 
+  const isUsingShortcut = typeof options === "string";
+  // Hold onto the OG options so we can revert them for some edge cases
+  let originalProvidedOptions: ZujiOptions = {};
+  if (isUsingShortcut) {
+    originalProvidedOptions = overrideOptions;
+  } else {
+    originalProvidedOptions = options;
+  }
+
   // Handle shortcut formats
   let formatOptions: ZujiOptions = {};
-  if (typeof options === "string") {
+  if (isUsingShortcut) {
     if (options in SHORTCUT_FORMATS) {
       formatOptions = SHORTCUT_FORMATS[options];
+      if (overrideOptions) {
+        formatOptions = { ...formatOptions, ...overrideOptions };
+      }
     } else {
       throw new Error(`Invalid shortcut format: ${options}`);
     }
@@ -371,6 +385,17 @@ export function zuji(
     } else {
       formatOptions.minimumFractionDigits = formatOptions.maximumFractionDigits;
     }
+  }
+  // make sure that minimumFractionDigits is not greater than maximumFractionDigits, use the value that was passed in if available
+  if (
+    formatOptions.minimumFractionDigits &&
+    formatOptions.maximumFractionDigits &&
+    formatOptions.minimumFractionDigits > formatOptions.maximumFractionDigits
+  ) {
+    formatOptions.minimumFractionDigits =
+      originalProvidedOptions.minimumFractionDigits;
+    formatOptions.maximumFractionDigits =
+      originalProvidedOptions.maximumFractionDigits;
   }
 
   // make sure the fraction digits are set if roundingIncrement is set
