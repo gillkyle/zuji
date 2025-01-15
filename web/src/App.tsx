@@ -1274,7 +1274,6 @@ console.log(formattedNumber); // 1,000
               <ExampleTable examples={LOCALE_EXAMPLES} />
             </WideContainer>
             <ProseContainer>
-              {/* doc safeMode */}
               <ApiOption
                 name="safeMode"
                 nativeType="boolean"
@@ -1295,7 +1294,25 @@ console.log(formattedNumber); // 1,000
               />
             </ProseContainer>
             <WideContainer>
-              <ExampleTable examples={EDGE_CASES} />
+              <ExampleTable
+                examples={[
+                  {
+                    // @ts-expect-error we're demonstrating safe mode
+                    value: "foo",
+                    options: {
+                      safeMode: true,
+                    },
+                    description: "Safe mode",
+                  },
+                  {
+                    value: NaN,
+                    options: {
+                      safeMode: true,
+                    },
+                    description: "Safe mode",
+                  },
+                ]}
+              />
             </WideContainer>
             <ProseContainer>
               <h2>Edge Cases</h2>
