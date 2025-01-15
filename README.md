@@ -1,16 +1,17 @@
 <div align="center">
   <h1>千 zuji</h1>
-  <p><strong>TypeScript first, human-readable numeric formatting</strong></p>
+  <br/>
+  <div><strong>TypeScript first, human-readable numeric formatting</strong></div>
+  <span>1540 → 1.5k</span>
+  <h1></h1>
 </div>
-
----
 
 zuji is a developer friendly API for formatting numbers. It is:
 
 - **straightforward to pick up** - the entire API surface is a single function + a few exported types if you need them
 - **standards based** - extends the `Intl.NumberFormat` API, making it consistent with JavaScript runtimes
 - **comprehensive** - covers virtually every option you need to format numbers, supporting every ISO standard locale
-- **tiny** - zero dependencies and single purpose
+- **tiny** - [~900 bytes](https://bundlephobia.com/package/zuji@1.0.8) with zero dependencies and single purpose
 - **flexible** - when you need to configure it further
 
 ## Installation
