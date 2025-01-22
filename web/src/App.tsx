@@ -59,7 +59,7 @@ const SHORTCUT_CASES: Array<TestCase> = [
     description: "Percentage with grouping and decimals",
   },
   {
-    value: 0.105075,
+    value: 0.27001,
     options: "standard-percent",
     description: "Percentage with grouping and decimals",
   },
